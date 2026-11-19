@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Editor de la página</title>
+<link rel="icon" href="favicon.png">
+<style>
+  :root { --brand: #2F80ED; --ink: #0F172A; --muted: #5B6476; --line: #E3E7EF; --soft: #F4F7FC; --bg: #fff; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #E8ECF4; --muted: #9AA4B8; --line: #263043; --soft: #131B2B; --bg: #0B1120; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--ink); background: var(--bg); }
+  .app { display: grid; grid-template-columns: 380px 1fr; height: 100vh; }
+  aside { border-right: 1px solid var(--line); overflow-y: auto; padding: 18px 18px 100px; background: var(--soft); }
+  h1 { font-size: 18px; margin: 0 0 4px; display: flex; gap: 8px; align-items: center; }
+  h1 img { width: 26px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 0 0 14px; line-height: 1.5; }
+  details { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
+  summary { font-weight: 700; cursor: pointer; padding: 2px 0; }
+  label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; margin-top: 10px; }
+  label small { color: var(--muted); font-weight: 400; }
+  input[type=text], input[type=url], input[type=number], select, textarea { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 100%; }
+  textarea { min-height: 54px; resize: vertical; }
+  .colors { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .colors label { grid-template-columns: 40px 1fr; align-items: center; }
+  input[type=color] { width: 40px; height: 34px; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: var(--bg); }
+  .checks label { grid-template-columns: auto 1fr; align-items: center; font-weight: 500; margin-top: 6px; }
+  .prices { display: grid; grid-template-columns: 1fr 80px 80px; gap: 6px; align-items: center; font-size: 13px; margin-top: 8px; }
+  .prices b { font-weight: 600; }
+  .bar { position: fixed; bottom: 0; left: 0; width: 380px; padding: 12px 18px; background: var(--bg); border-top: 1px solid var(--line); display: flex; gap: 8px; }
+  button { font: inherit; font-weight: 700; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+  button.main { background: var(--brand); color: #fff; border-color: var(--brand); flex: 1; }
+  .preview { display: grid; grid-template-rows: auto 1fr; }
+  .ptop { display: flex; gap: 8px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+  .ptop button { padding: 5px 10px; font-size: 13px; }
+  .ptop button[aria-pressed="true"] { border-color: var(--brand); color: var(--brand); }
+  .frame { display: grid; place-items: start center; overflow: auto; background: repeating-conic-gradient(var(--soft) 0 25%, var(--bg) 0 50%) 0 0/20px 20px; }
+  iframe { border: 0; width: 100%; height: 100%; background: #fff; transition: width .2s; }
+  .ok { position: fixed; bottom: 70px; left: 18px; width: 344px; background: #12A150; color: #fff; padding: 10px 12px; border-radius: 10px; font-size: 13px; display: none; }
+  @media (max-width: 860px) { .app { grid-template-columns: 1fr; height: auto; } .preview { height: 80vh; } .bar, .ok { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1><img src="logo.svg" alt="">Editor de la página</h1>
+    <p class="hint">Cambia lo que quieras y míralo a la derecha. Cuando te guste, pulsa <b>Descargar ajustes.js</b> y súbelo a GitHub reemplazando el archivo <code>ajustes.js</code>. En 1–2 minutos la página queda actualizada para todos.</p>
+
+    <details open><summary>🎨 Colores y forma</summary>
+      <div class="colors">
+        <label><input type="color" id="c_marca"><span>Principal<br><small>botones, enlaces</small></span></label>
+        <label><input type="color" id="c_marcaOscuro"><span>Oscuro<br><small>degradados</small></span></label>
+        <label><input type="color" id="c_acento"><span>Acento<br><small>Vigía Comparte</small></span></label>
+        <label><input type="color" id="c_dorado"><span>Dorado<br><small>detalles</small></span></label>
+      </div>
+      <label>Tipo de letra <select id="fuente"><option>Inter</option><option>Poppins</option><option>Montserrat</option><option>Nunito</option><option>DM Sans</option><option>Plus Jakarta Sans</option><option>Outfit</option></select></label>
+      <label>Redondeo de esquinas: <span id="esqv"></span> <input type="range" id="esquinas" min="0" max="28"></label>
+      <p class="hint" style="margin-top:10px">Ideas rápidas:
+        <button type="button" data-pal="#2F80ED,#1E3A8A,#E11D74,#F5B301">Azul Vigía</button>
+        <button type="button" data-pal="#0E9F6E,#065F46,#F59E0B,#F5B301">Verde ahorro</button>
+        <button type="button" data-pal="#7C3AED,#3B0764,#EC4899,#F5B301">Morado</button>
+        <button type="button" data-pal="#111827,#000000,#F97316,#F5B301">Negro elegante</button>
+      </p>
+    </details>
+
+    <details><summary>✍️ Textos principales</summary>
+      <p class="hint">Vacío = texto de fábrica. Lo que pongas entre *asteriscos* sale en el color principal.</p>
+      <label>Título (español) <textarea id="titulo_es" placeholder="¿Ese descuento es real? *Vigía te lo dice antes de pagar.*"></textarea></label>
+      <label>Título (inglés) <textarea id="titulo_en" placeholder="Is that deal real? *Vigía tells you before you pay.*"></textarea></label>
+      <label>Subtítulo (español) <textarea id="subtitulo_es"></textarea></label>
+      <label>Subtítulo (inglés) <textarea id="subtitulo_en"></textarea></label>
+      <label>Firma de la carta <input type="text" id="firma"></label>
+    </details>
+
+    <details><summary>🧩 Secciones visibles</summary>
+      <div class="checks" id="secs"></div>
+    </details>
+
+    <details><summary>💲 Precios (USD)</summary>
+      <div class="prices"><b>Plan</b><b>Mensual</b><b>Anual</b><div id="prs" style="display:contents"></div></div>
+    </details>
+
+    <details><summary>🔗 Enlaces y datos</summary>
+      <label>% de ganancias para obras benéficas <input type="number" id="obrasBeneficasPct" min="0" max="100"></label>
+      <label>Enlace en la Chrome Web Store <small>cuando Google la apruebe</small><input type="url" id="tiendaChrome" placeholder="https://chromewebstore.google.com/detail/…"></label>
+      <label>Dirección de esta página <input type="url" id="sitio"></label>
+      <label>Correo de soporte <input type="text" id="correo"></label>
+      <label>Instagram <input type="url" id="r_instagram" placeholder="https://instagram.com/…"></label>
+      <label>TikTok <input type="url" id="r_tiktok" placeholder="https://tiktok.com/@…"></label>
+      <label>YouTube <input type="url" id="r_youtube" placeholder="https://youtube.com/@…"></label>
+      <label>Facebook <input type="url" id="r_facebook" placeholder="https://facebook.com/…"></label>
+      <label>Fecha de Black Friday <input type="text" id="blackFriday" placeholder="2026-11-27"></label>
+    </details>
+  </aside>
+
+  <div class="preview">
+    <div class="ptop">Vista previa:
+      <button data-w="100%" aria-pressed="true">💻 Computador</button><button data-w="390px" aria-pressed="false">📱 Celular</button>
+      <span style="margin-inline-start:auto">Idioma:</span><button data-lg="es" aria-pressed="true">ES</button><button data-lg="en" aria-pressed="false">EN</button>
+    </div>
+    <div class="frame"><iframe id="pv" src="index.html" title="Vista previa"></iframe></div>
+  </div>
+</div>
+<div class="bar"><button class="main" id="dl">⬇ Descargar ajustes.js</button><button id="cp">Copiar</button><button id="rs" title="Volver a lo publicado">↺</button></div>
+<div class="ok" id="ok"></div>
+
+<script src="ajustes.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const ORIG = JSON.parse(JSON.stringify(window.VIGIA_SITE || {}));
+  const SECS = { promo: 'Aviso de Black Friday', cifras: 'Cifras (países, tiendas, idiomas)', problema: 'El problema y tabla comparativa', funciones: 'Funciones', como: 'Cómo funciona y capturas', calculadora: 'Calculadora de ahorro', principios: 'Nuestros principios', comparte: 'Vigía Comparte (obras benéficas)', carta: 'Carta del creador', invita: 'Invita y gana', preguntas: 'Preguntas frecuentes' };
+  const PLANS = { esencial: 'Esencial', plus: 'Plus', familia: 'Familia', emprendedor: 'Emprendedor', pyme: 'Pyme', corporativo: 'Corporativo' };
+  let lang = 'es';
+  $('secs').innerHTML = Object.entries(SECS).map(([k, l]) => `<label><input type="checkbox" data-sec="${k}"> ${l}</label>`).join('');
+  $('prs').innerHTML = Object.entries(PLANS).map(([k, l]) => `<span>${l}</span><input type="number" step="0.01" min="0" data-pm="${k}"><input type="number" step="0.01" min="0" data-py="${k}">`).join('');
+
+  function fill(S) {
+    const c = S.colores || {};
+    ['marca', 'marcaOscuro', 'acento', 'dorado'].forEach(k => { $('c_' + k).value = c[k] || '#2F80ED'; });
+    $('fuente').value = S.fuente || 'Inter'; $('esquinas').value = S.esquinas ?? 16;
+    const t = S.textos || {}; ['titulo_es', 'titulo_en', 'subtitulo_es', 'subtitulo_en', 'firma'].forEach(k => { $(k).value = t[k] || ''; });
+    document.querySelectorAll('[data-sec]').forEach(i => { i.checked = (S.secciones || {})[i.dataset.sec] !== false; });
+    const p = S.precios || {}; Object.keys(PLANS).forEach(k => { const v = p[k] || ['', '']; document.querySelector(`[data-pm="${k}"]`).value = v[0]; document.querySelector(`[data-py="${k}"]`).value = v[1]; });
+    ['obrasBeneficasPct', 'tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { $(k).value = S[k] ?? ''; });
+    const r = S.redes || {}; ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { $('r_' + k).value = r[k] || ''; });
+  }
+  function read() {
+    const S = { colores: {}, secciones: {}, textos: {}, precios: {}, redes: {} };
+    ['marca', 'marcaOscuro', 'acento', 'dorado'].forEach(k => { S.colores[k] = $('c_' + k).value; });
+    S.fuente = $('fuente').value; S.esquinas = +$('esquinas').value;
+    document.querySelectorAll('[data-sec]').forEach(i => { S.secciones[i.dataset.sec] = i.checked; });
+    ['titulo_es', 'titulo_en', 'subtitulo_es', 'subtitulo_en', 'firma'].forEach(k => { S.textos[k] = $(k).value.trim(); });
+    Object.keys(PLANS).forEach(k => { S.precios[k] = [+document.querySelector(`[data-pm="${k}"]`).value || 0, +document.querySelector(`[data-py="${k}"]`).value || 0]; });
+    S.obrasBeneficasPct = Math.max(0, Math.min(100, +$('obrasBeneficasPct').value || 0));
+    ['tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { S[k] = $(k).value.trim(); });
+    ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { S.redes[k] = $('r_' + k).value.trim(); });
+    return S;
+  }
+  function send() {
+    $('esqv').textContent = $('esquinas').value + ' px';
+    try { $('pv').contentWindow.postMessage({ type: 'vigia-preview', settings: read(), lang }, location.protocol === 'file:' ? '*' : location.origin); } catch (e) {}
+  }
+  function fileText(S) {
+    const J = v => JSON.stringify(v);
+    const sec = Object.entries(S.secciones).map(([k, v]) => `    ${k}: ${v}`).join(',\n');
+    const pr = Object.entries(S.precios).map(([k, v]) => `${k}: [${v[0]}, ${v[1]}]`).join(', ');
+    return `// =====================================================================
+//  AJUSTES DE LA PÁGINA DE VIGÍA — creado con editor.html el ${new Date().toLocaleString('es-CO')}
+//  Súbelo a GitHub reemplazando ajustes.js. La página se actualiza en 1–2 minutos.
+// =====================================================================
+window.VIGIA_SITE = {
+  colores: { marca: ${J(S.colores.marca)}, marcaOscuro: ${J(S.colores.marcaOscuro)}, acento: ${J(S.colores.acento)}, dorado: ${J(S.colores.dorado)} },
+  fuente: ${J(S.fuente)},
+  esquinas: ${S.esquinas},
+  secciones: {
+${sec}
+  },
+  textos: {
+    titulo_es: ${J(S.textos.titulo_es)},
+    titulo_en: ${J(S.textos.titulo_en)},
+    subtitulo_es: ${J(S.textos.subtitulo_es)},
+    subtitulo_en: ${J(S.textos.subtitulo_en)},
+    firma: ${J(S.textos.firma)}
+  },
+  precios: { ${pr} },
+  obrasBeneficasPct: ${S.obrasBeneficasPct},
+  tiendaChrome: ${J(S.tiendaChrome)},
+  sitio: ${J(S.sitio)},
+  correo: ${J(S.correo)},
+  redes: { instagram: ${J(S.redes.instagram)}, tiktok: ${J(S.redes.tiktok)}, youtube: ${J(S.redes.youtube)}, facebook: ${J(S.redes.facebook)} },
+  blackFriday: ${J(S.blackFriday)}
+};
+`;
+  }
+  function toast(m) { const o = $('ok'); o.textContent = m; o.style.display = 'block'; setTimeout(() => { o.style.display = 'none'; }, 4000); }
+
+  document.querySelector('aside').addEventListener('input', send);
+  document.querySelector('aside').addEventListener('change', send);
+  document.querySelectorAll('[data-pal]').forEach(b => b.addEventListener('click', () => { const [a, d, c, g] = b.dataset.pal.split(','); $('c_marca').value = a; $('c_marcaOscuro').value = d; $('c_acento').value = c; $('c_dorado').value = g; send(); }));
+  document.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('[data-w]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); $('pv').style.width = b.dataset.w; }));
+  document.querySelectorAll('[data-lg]').forEach(b => b.addEventListener('click', () => { lang = b.dataset.lg; document.querySelectorAll('[data-lg]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); send(); }));
+  $('pv').addEventListener('load', send);
+  $('dl').addEventListener('click', () => {
+    const blob = new Blob([fileText(read())], { type: 'text/javascript' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'ajustes.js'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast('Listo. Ahora en GitHub: abre el repositorio → "Add file" → "Upload files" → arrastra ajustes.js → "Commit changes".');
+  });
+  $('cp').addEventListener('click', async () => { try { await navigator.clipboard.writeText(fileText(read())); toast('Copiado. En GitHub abre ajustes.js → lápiz ✏️ → borra todo, pega y "Commit changes".'); } catch (e) {} });
+  $('rs').addEventListener('click', () => { fill(ORIG); send(); toast('Volviste a lo que está publicado.'); });
+  fill(ORIG); send();
+})();
+</script>
+</body>
+</html>

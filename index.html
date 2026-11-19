@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vigía — ¿Ese descuento es real? Compara precios antes de pagar</title>
+<meta name="description" content="Vigía es una extensión gratis para Chrome que detecta descuentos falsos, compara el mismo producto en otras tiendas y te avisa de tiendas dudosas. 62 países, 14 idiomas. El 10 % de las ganancias va a obras benéficas.">
+<meta name="theme-color" content="#2F80ED">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vigía — ¿Ese descuento es real?">
+<meta property="og:description" content="Extensión gratis que compara precios, detecta descuentos falsos y tiendas dudosas en cualquier tienda del mundo.">
+<meta property="og:image" content="og-vigia.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="logo-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="estilo.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Vigía","applicationCategory":"ShoppingApplication","operatingSystem":"Chrome","description":"Extensión que compara precios, detecta descuentos falsos y tiendas dudosas.","offers":[{"@type":"Offer","price":"0","priceCurrency":"USD","name":"Gratis"},{"@type":"Offer","price":"4.99","priceCurrency":"USD","name":"Plus mensual"}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"¿Vigía es gratis?","acceptedAnswer":{"@type":"Answer","text":"Sí. El plan gratis protege tus compras para siempre y al instalar recibes 7 días de Premium de regalo, sin tarjeta."}},
+{"@type":"Question","name":"¿En qué países funciona?","acceptedAnswer":{"@type":"Answer","text":"La nota, los descuentos falsos y las tiendas dudosas funcionan en cualquier tienda del mundo. La comparación con otras tiendas tiene más de 110 tiendas configuradas en 62 países."}},
+{"@type":"Question","name":"¿Cómo gana dinero Vigía?","acceptedAnswer":{"@type":"Answer","text":"Con los planes Premium y comisiones de afiliado solo cuando te mostramos un precio más bajo. Tu precio no cambia. El 10 % de las ganancias va a obras benéficas."}}]}
+</script>
+</head>
+<body>
+<div class="promo" id="promo" hidden>
+  <div class="wrap"><span data-l="es">🛍️ <b>Black Friday es el viernes 27 de noviembre</b> <span class="cd"></span> — instala Vigía antes y descubre qué descuentos son de verdad.</span><span data-l="en">🛍️ <b>Black Friday is Friday, November 27</b> <span class="cd"></span> — install Vigía first and find out which deals are real.</span></div>
+</div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="logo.svg" alt="">Vigía</a>
+    <nav>
+      <a href="#funciones"><span data-l="es">Funciones</span><span data-l="en">Features</span></a>
+      <a href="#ahorro"><span data-l="es">¿Cuánto ahorras?</span><span data-l="en">Your savings</span></a>
+      <a href="#comparte" data-sec="comparte"><span data-l="es">Vigía Comparte</span><span data-l="en">Vigía Gives</span></a>
+      <a href="#precios"><span data-l="es">Precios</span><span data-l="en">Pricing</span></a>
+    </nav>
+    <div class="langs"><button data-set="es" aria-pressed="true">ES</button><button data-set="en" aria-pressed="false">EN</button></div>
+    <a class="btn small store-link hide-m" href="#precios"><span data-l="es">Agregar gratis</span><span data-l="en">Add free</span></a>
+  </div>
+</header>
+
+<main>
+  <!-- 1. PORTADA: el dolor + la promesa + la acción -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><span data-l="es">Extensión gratis para Chrome</span><span data-l="en">Free Chrome extension</span></span>
+        <h1 data-txt="titulo"><span data-l="es">¿Ese descuento es real? <em>Vigía te lo dice antes de pagar.</em></span><span data-l="en">Is that deal real? <em>Vigía tells you before you pay.</em></span></h1>
+        <p class="lead" data-txt="subtitulo"><span data-l="es">Revisa el historial de precios, busca el mismo producto más barato en otras tiendas de tu país y te avisa si la tienda es dudosa. Todo en segundos, mientras compras como siempre.</span><span data-l="en">It checks price history, finds the same product cheaper in other stores in your country and warns you about risky stores. All in seconds, while you shop as usual.</span></p>
+        <div class="cta">
+          <a class="btn big store-link" href="#precios"><span data-l="es">Agregar a Chrome — es gratis</span><span data-l="en">Add to Chrome — it's free</span></a>
+          <a class="btn ghost big" href="#como"><span data-l="es">Ver cómo funciona</span><span data-l="en">See how it works</span></a>
+        </div>
+        <p class="micro"><span data-l="es">🎁 7 días de Premium de regalo · Sin tarjeta · Cancela cuando quieras</span><span data-l="en">🎁 7 days of Premium as a gift · No card · Cancel anytime</span></p>
+        <a class="givechip" href="#comparte" data-sec="comparte"><span data-l="es">💙 El <span class="pct">10 %</span> de nuestras ganancias va a obras benéficas</span><span data-l="en">💙 <span class="pct">10 %</span> of our profits goes to charity</span></a>
+      </div>
+      <div class="stage"><img class="p2" src="panel-descuento.png" alt="" width="342" height="634"><img class="p1" src="panel-comparar.png" alt="Vigía comparando el mismo producto en otras tiendas" width="342" height="636"></div>
+    </div>
+  </section>
+
+  <!-- 2. CIFRAS REALES (prueba sin inventar) -->
+  <section class="stats" data-sec="cifras">
+    <div class="wrap">
+      <div><b>62</b><span data-l="es">países con comparación</span><span data-l="en">countries with comparison</span></div>
+      <div><b>+110</b><span data-l="es">tiendas configuradas</span><span data-l="en">stores supported</span></div>
+      <div><b>14</b><span data-l="es">idiomas</span><span data-l="en">languages</span></div>
+      <div><b>0</b><span data-l="es">datos personales vendidos</span><span data-l="en">personal data sold</span></div>
+    </div>
+  </section>
+
+  <!-- 3. EL PROBLEMA (marketing 2.0: empatía con el comprador) -->
+  <section class="block" id="problema" data-sec="problema">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow"><span data-l="es">El problema</span><span data-l="en">The problem</span></span>
+        <h2><span data-l="es">Comprar por internet no debería sentirse como una apuesta</span><span data-l="en">Shopping online shouldn't feel like a gamble</span></h2>
+      </div>
+      <div class="grid3">
+        <div class="pain"><div class="ic">🎭</div><h3><span data-l="es">El "antes" que nunca existió</span><span data-l="en">The "was" price that never was</span></h3><p><span data-l="es">Suben el precio unos días y luego lo "rebajan". Parece oferta, pero pagas lo mismo o más.</span><span data-l="en">They raise the price for a few days, then "discount" it. It looks like a deal, but you pay the same or more.</span></p></div>
+        <div class="pain"><div class="ic">🔁</div><h3><span data-l="es">El mismo producto, más barato al lado</span><span data-l="en">The same product, cheaper next door</span></h3><p><span data-l="es">Otra tienda de tu país lo tiene más barato, pero revisarlas una por una toma horas.</span><span data-l="en">Another store in your country has it cheaper, but checking them one by one takes hours.</span></p></div>
+        <div class="pain"><div class="ic">🚩</div><h3><span data-l="es">Tiendas que no entregan</span><span data-l="en">Stores that never deliver</span></h3><p><span data-l="es">Precios demasiado buenos, pagos raros y sin contacto real. Cuando te das cuenta, ya pagaste.</span><span data-l="en">Too-good prices, odd payment methods and no real contact. By the time you notice, you've paid.</span></p></div>
+      </div>
+      <div class="vs">
+        <table>
+          <thead><tr><th></th><th><span data-l="es">Comprando a ciegas</span><span data-l="en">Shopping blind</span></th><th class="us">Vigía</th></tr></thead>
+          <tbody>
+            <tr><td><span data-l="es">¿El descuento es real?</span><span data-l="en">Is the discount real?</span></td><td>❌ <span data-l="es">Confías en la etiqueta</span><span data-l="en">You trust the label</span></td><td class="us">✅ <span data-l="es">Historial de precios</span><span data-l="en">Price history</span></td></tr>
+            <tr><td><span data-l="es">¿Hay otro más barato?</span><span data-l="en">Is there a cheaper one?</span></td><td>❌ <span data-l="es">Abres 10 pestañas</span><span data-l="en">You open 10 tabs</span></td><td class="us">✅ <span data-l="es">Comparación automática</span><span data-l="en">Automatic comparison</span></td></tr>
+            <tr><td><span data-l="es">¿La tienda es confiable?</span><span data-l="en">Is the store trustworthy?</span></td><td>❌ <span data-l="es">Lo descubres tarde</span><span data-l="en">You find out too late</span></td><td class="us">✅ <span data-l="es">Aviso antes de pagar</span><span data-l="en">Warning before you pay</span></td></tr>
+            <tr><td><span data-l="es">¿Comprar hoy o esperar?</span><span data-l="en">Buy now or wait?</span></td><td>❌ <span data-l="es">Adivinas</span><span data-l="en">You guess</span></td><td class="us">✅ <span data-l="es">Nota de 0 a 100 y alertas</span><span data-l="en">0–100 score and alerts</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. FUNCIONES (marketing 1.0: el producto) -->
+  <section class="block alt" id="funciones" data-sec="funciones">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow"><span data-l="es">Funciones</span><span data-l="en">Features</span></span>
+        <h2><span data-l="es">Todo lo que necesitas para no pagar de más</span><span data-l="en">Everything you need to stop overpaying</span></h2>
+      </div>
+      <div class="grid3">
+        <div class="feat"><div class="ic">🎯</div><h3><span data-l="es">Nota de 0 a 100</span><span data-l="en">A 0–100 score</span></h3><p><span data-l="es">Cada compra recibe una calificación y te explicamos por qué, en palabras simples.</span><span data-l="en">Every purchase gets a score with a plain-language explanation.</span></p></div>
+        <div class="feat"><div class="ic">🏷️</div><h3><span data-l="es">Descuentos falsos</span><span data-l="en">Fake discounts</span></h3><p><span data-l="es">Detectamos cuando el "antes" fue inflado para parecer oferta.</span><span data-l="en">We spot when the "was" price was inflated to look like a deal.</span></p></div>
+        <div class="feat"><div class="ic">🔎</div><h3><span data-l="es">Mismo producto o similar</span><span data-l="en">Same product or similar</span></h3><p><span data-l="es">Buscamos en otras tiendas y te decimos con claridad si es el mismo producto o uno parecido.</span><span data-l="en">We search other stores and tell you clearly whether it's the same product or a similar one.</span></p></div>
+        <div class="feat"><div class="ic">🛡️</div><h3><span data-l="es">Tiendas dudosas</span><span data-l="en">Risky stores</span></h3><p><span data-l="es">Señales de fraude antes de pagar, en cualquier tienda del mundo.</span><span data-l="en">Fraud signals before you pay, on any store in the world.</span></p></div>
+        <div class="feat"><div class="ic">🔔</div><h3><span data-l="es">Alertas de precio</span><span data-l="en">Price alerts</span></h3><p><span data-l="es">Elige un precio y te avisamos cuando baje.</span><span data-l="en">Pick a target price and we'll tell you when it drops.</span></p></div>
+        <div class="feat"><div class="ic">🚗</div><h3><span data-l="es">Carros, inmuebles y viajes</span><span data-l="en">Cars, homes and travel</span></h3><p><span data-l="es">Precio justo, kilometraje por año, avisos parecidos y la misma búsqueda de hotel o vuelo en otras plataformas.</span><span data-l="en">Fair price, mileage per year, similar listings and the same hotel or flight search on other platforms.</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CÓMO FUNCIONA -->
+  <section class="block" id="como" data-sec="como">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow"><span data-l="es">Cómo funciona</span><span data-l="en">How it works</span></span>
+        <h2><span data-l="es">Instálala una vez y compra como siempre</span><span data-l="en">Install once and shop as usual</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step"><h3><span data-l="es">Agrégala a Chrome</span><span data-l="en">Add it to Chrome</span></h3><p><span data-l="es">Es gratis y tarda segundos. Recibes 7 días de Premium de regalo.</span><span data-l="en">Free, takes seconds. You get 7 days of Premium as a gift.</span></p></div>
+        <div class="step"><h3><span data-l="es">Abre cualquier producto</span><span data-l="en">Open any product</span></h3><p><span data-l="es">Vigía aparece en una esquina: verde es buen precio, rojo es cuidado.</span><span data-l="en">Vigía appears in a corner: green is a good price, red means careful.</span></p></div>
+        <div class="step"><h3><span data-l="es">Decide con información</span><span data-l="en">Decide with facts</span></h3><p><span data-l="es">Mira la nota, dónde está más barato o crea una alerta si prefieres esperar.</span><span data-l="en">See the score, where it's cheaper, or set an alert if you'd rather wait.</span></p></div>
+      </div>
+      <div class="gallery" style="margin-top:36px">
+        <figure><div class="pshot"><img src="panel-descuento.png" alt="" loading="lazy" width="342" height="634"></div><figcaption><span data-l="es">Descuento real o inflado</span><span data-l="en">Real or inflated discount</span></figcaption></figure>
+        <figure><div class="pshot"><img src="panel-comparar.png" alt="" loading="lazy" width="342" height="636"></div><figcaption><span data-l="es">El mismo producto, más barato</span><span data-l="en">Same product, cheaper</span></figcaption></figure>
+        <figure><div class="pshot"><img src="panel-tienda.png" alt="" loading="lazy" width="342" height="636"></div><figcaption><span data-l="es">Aviso de tienda dudosa</span><span data-l="en">Risky store warning</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. CALCULADORA (marketing 2.0: el beneficio en su bolsillo) -->
+  <section class="block alt" id="ahorro" data-sec="calculadora">
+    <div class="wrap calc">
+      <div>
+        <span class="eyebrow"><span data-l="es">Haz la cuenta</span><span data-l="en">Do the math</span></span>
+        <h2><span data-l="es">¿Cuánto podrías ahorrar en un año?</span><span data-l="en">How much could you save in a year?</span></h2>
+        <p class="muted"><span data-l="es">Escribe cuánto gastas al mes comprando por internet. Ejemplo ilustrativo: si en tus compras encuentras una diferencia promedio del porcentaje que elijas.</span><span data-l="en">Enter how much you spend online per month. Illustrative example: if your purchases show an average difference of the percentage you choose.</span></p>
+      </div>
+      <div class="calcbox">
+        <label><span data-l="es">Gasto mensual en compras por internet</span><span data-l="en">Monthly online spending</span>
+          <div class="row"><select id="cur"><option value="COP">COP</option><option value="MXN">MXN</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="PEN">PEN</option><option value="CLP">CLP</option><option value="ARS">ARS</option><option value="BRL">BRL</option></select><input id="spend" type="number" min="0" step="1000" value="500000"></div></label>
+        <label><span data-l="es">Diferencia que encuentras</span><span data-l="en">Difference you find</span> <b id="pctv">8 %</b>
+          <input id="pct" type="range" min="2" max="20" value="8"></label>
+        <div class="result"><span data-l="es">Ahorro posible al año</span><span data-l="en">Possible yearly savings</span><b id="save">—</b></div>
+        <p class="roi" id="roi"></p>
+        <a class="btn store-link" href="#precios" style="width:100%;justify-content:center"><span data-l="es">Empezar a ahorrar gratis</span><span data-l="en">Start saving for free</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. PRINCIPIOS (marketing 3.0: valores) -->
+  <section class="block" id="principios" data-sec="principios">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow"><span data-l="es">Nuestros principios</span><span data-l="en">Our principles</span></span>
+        <h2><span data-l="es">Una herramienta que está de tu lado, no del vendedor</span><span data-l="en">A tool that's on your side, not the seller's</span></h2>
+      </div>
+      <div class="grid4">
+        <div class="val"><div class="ic">⚖️</div><h3><span data-l="es">Nadie paga por una mejor nota</span><span data-l="en">No one pays for a better score</span></h3><p><span data-l="es">Ninguna tienda o marca puede comprar una calificación. Si lo permitiéramos, Vigía dejaría de servir.</span><span data-l="en">No store or brand can buy a score. If we allowed it, Vigía would stop being useful.</span></p></div>
+        <div class="val"><div class="ic">🔍</div><h3><span data-l="es">Transparencia total</span><span data-l="en">Full transparency</span></h3><p><span data-l="es">Te decimos cómo ganamos dinero. Los enlaces de afiliado solo aparecen cuando hay un ahorro real y puedes apagarlos.</span><span data-l="en">We tell you how we make money. Affiliate links only appear when there's a real saving, and you can turn them off.</span></p></div>
+        <div class="val"><div class="ic">🔒</div><h3><span data-l="es">Tu privacidad primero</span><span data-l="en">Your privacy first</span></h3><p><span data-l="es">Tus productos y alertas se quedan en tu navegador. No vendemos tus datos.</span><span data-l="en">Your products and alerts stay in your browser. We don't sell your data.</span></p></div>
+        <div class="val"><div class="ic">🤝</div><h3><span data-l="es">Hecha con la comunidad</span><span data-l="en">Built with the community</span></h3><p><span data-l="es">Personas de cada país nos avisan cuando una tienda cambia. Un arreglo aplica para todos cuando más de 3 personas lo confirman.</span><span data-l="en">People in each country tell us when a store changes. A fix applies to everyone once more than 3 people confirm it.</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. VIGÍA COMPARTE (marketing 3.0: propósito) -->
+  <section class="block give" id="comparte" data-sec="comparte">
+    <div class="wrap givewrap">
+      <div>
+        <span class="eyebrow light"><span data-l="es">Vigía Comparte</span><span data-l="en">Vigía Gives</span></span>
+        <h2><span data-l="es">Tú ahorras. Juntos ayudamos.</span><span data-l="en">You save. Together we help.</span></h2>
+        <p><span data-l="es">Destinamos el <b class="pct">10 %</b> de las ganancias de los planes Premium a obras benéficas: desayunos y mercados para quien no tiene qué comer, ropa para quien la necesita y alimento para animales sin hogar.</span><span data-l="en">We give <b class="pct">10 %</b> of Premium profits to charity: breakfasts and groceries for people who have nothing to eat, clothes for those in need and food for homeless animals.</span></p>
+        <p><span data-l="es">Cada jornada la mostramos en nuestras redes y publicamos un informe de transparencia: cuánto se recaudó y en qué se usó.</span><span data-l="en">We show every outreach day on our social channels and publish a transparency report: how much was raised and how it was used.</span></p>
+        <div class="social" id="social"></div>
+      </div>
+      <div class="givecards">
+        <div>🍳<span data-l="es">Desayunos</span><span data-l="en">Breakfasts</span></div>
+        <div>🛒<span data-l="es">Mercados</span><span data-l="en">Groceries</span></div>
+        <div>🧥<span data-l="es">Ropa</span><span data-l="en">Clothing</span></div>
+        <div>🐾<span data-l="es">Animales</span><span data-l="en">Animals</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. CARTA DEL CREADOR (reciprocidad e historia) -->
+  <section class="block" data-sec="carta">
+    <div class="wrap letter">
+      <img src="logo.svg" alt="" width="56" height="56">
+      <div>
+        <p class="quote"><span data-l="es">"Es un gusto que estés aquí. Creé Vigía porque me cansé de ver descuentos que no eran descuentos y amigos que pagaban de más sin saberlo. Por eso te regalo la experiencia completa durante 7 días, sin tarjeta y sin letra pequeña. Si te ayuda, quédate. Y si te quedas, sabrás que una parte de lo que pagas termina en un plato de comida para alguien que lo necesita."</span><span data-l="en">"I'm glad you're here. I built Vigía because I was tired of seeing discounts that weren't discounts and friends overpaying without knowing it. That's why I'm giving you the full experience for 7 days, no card, no fine print. If it helps, stay. And if you stay, you'll know part of what you pay ends up as a meal for someone in need."</span></p>
+        <p class="sign">— <span class="firma">Santiago</span>, <span data-l="es">creador de Vigía · Colombia</span><span data-l="en">creator of Vigía · Colombia</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. PRECIOS -->
+  <section class="block alt" id="precios">
+    <div class="wrap">
+      <div class="head">
+        <span class="eyebrow"><span data-l="es">Precios</span><span data-l="en">Pricing</span></span>
+        <h2><span data-l="es">Empieza gratis. Pasa a Premium cuando quieras.</span><span data-l="en">Start free. Go Premium whenever you like.</span></h2>
+        <p><span data-l="es">Plus cuesta menos que un café al mes y una sola compra bien hecha lo paga.</span><span data-l="en">Plus costs less than a coffee a month, and one smart purchase pays for it.</span></p>
+      </div>
+      <div class="center"><div class="toggle" role="group"><button data-per="m" aria-pressed="true"><span data-l="es">Mensual</span><span data-l="en">Monthly</span></button><button data-per="y" aria-pressed="false"><span data-l="es">Anual · 2 meses gratis</span><span data-l="en">Yearly · 2 months free</span></button></div></div>
+
+      <h3 class="sub"><span data-l="es">👤 Para personas</span><span data-l="en">👤 For individuals</span></h3>
+      <div class="plans">
+        <div class="plan"><h3><span data-l="es">Gratis</span><span data-l="en">Free</span></h3><p class="who"><span data-l="es">Para empezar a protegerte.</span><span data-l="en">To start protecting yourself.</span></p><div class="price">US$0</div>
+          <ul><li><span data-l="es">Nota, descuentos falsos y tiendas dudosas</span><span data-l="en">Score, fake discounts and risky stores</span></li><li><span data-l="es">3 comparaciones completas al día</span><span data-l="en">3 full comparisons per day</span></li><li><span data-l="es">3 alertas de precio</span><span data-l="en">3 price alerts</span></li></ul>
+          <a class="btn ghost store-link" href="#precios"><span data-l="es">Instalar gratis</span><span data-l="en">Install free</span></a></div>
+        <div class="plan"><h3>Esencial</h3><p class="who"><span data-l="es">Compras sin límites, 1 computador.</span><span data-l="en">Unlimited shopping, 1 computer.</span></p><div class="price" data-p="esencial" data-m="2.49" data-y="24.90"></div>
+          <ul><li><span data-l="es">Comparaciones sin límite</span><span data-l="en">Unlimited comparisons</span></li><li><span data-l="es">Alertas que revisan cada hora</span><span data-l="en">Alerts checked every hour</span></li><li><span data-l="es">Sin publicidad</span><span data-l="en">No ads</span></li></ul>
+          <a class="btn ghost store-link" href="#precios"><span data-l="es">Probar 7 días gratis</span><span data-l="en">Try 7 days free</span></a></div>
+        <div class="plan star"><span class="badge"><span data-l="es">Recomendado</span><span data-l="en">Recommended</span></span><h3>Plus</h3><p class="who"><span data-l="es">Todo Vigía, 2 computadores.</span><span data-l="en">All of Vigía, 2 computers.</span></p><div class="price" data-p="plus" data-m="4.99" data-y="49.90"></div>
+          <ul><li><span data-l="es">Todo lo de Esencial</span><span data-l="en">Everything in Esencial</span></li><li><span data-l="es">Carros e inmuebles con valor justo</span><span data-l="en">Cars and homes with fair value</span></li><li><span data-l="es">Asistente con IA e informes</span><span data-l="en">AI assistant and reports</span></li></ul>
+          <a class="btn store-link" href="#precios"><span data-l="es">Probar 7 días gratis</span><span data-l="en">Try 7 days free</span></a></div>
+        <div class="plan"><h3>Familia</h3><p class="who"><span data-l="es">Todo Vigía para tu hogar, 5 computadores.</span><span data-l="en">All of Vigía for your home, 5 computers.</span></p><div class="price" data-p="familia" data-m="7.49" data-y="74.90"></div>
+          <ul><li><span data-l="es">Todo lo de Plus</span><span data-l="en">Everything in Plus</span></li><li><span data-l="es">Hasta 5 equipos</span><span data-l="en">Up to 5 devices</span></li><li><span data-l="es">Ideal para toda la familia</span><span data-l="en">Great for the whole family</span></li></ul>
+          <a class="btn ghost store-link" href="#precios"><span data-l="es">Probar 7 días gratis</span><span data-l="en">Try 7 days free</span></a></div>
+      </div>
+
+      <h3 class="sub"><span data-l="es">🏢 Para negocios: vigila los precios de tu competencia</span><span data-l="en">🏢 For businesses: monitor your competitors' prices</span></h3>
+      <div class="plans biz">
+        <div class="plan"><h3>Emprendedor</h3><p class="who"><span data-l="es">2 usuarios · vigila 50 productos de la competencia.</span><span data-l="en">2 users · monitor 50 competitor products.</span></p><div class="price" data-p="emprendedor" data-m="15" data-y="150"></div></div>
+        <div class="plan star"><span class="badge"><span data-l="es">Más elegido</span><span data-l="en">Most popular</span></span><h3>Pyme</h3><p class="who"><span data-l="es">5 usuarios · vigila 200 productos de la competencia.</span><span data-l="en">5 users · monitor 200 competitor products.</span></p><div class="price" data-p="pyme" data-m="29" data-y="290"></div></div>
+        <div class="plan"><h3>Corporativo</h3><p class="who"><span data-l="es">20 usuarios · vigila 1.000 productos de la competencia.</span><span data-l="en">20 users · monitor 1,000 competitor products.</span></p><div class="price" data-p="corporativo" data-m="75" data-y="750"></div></div>
+      </div>
+      <div class="guarantee"><b>🛡️ <span data-l="es">Garantía de 14 días</span><span data-l="en">14-day guarantee</span></b> <span data-l="es">Si Premium no te convence, te devolvemos el 100 % de tu primer pago. Sin preguntas difíciles.</span><span data-l="en">If Premium doesn't convince you, we refund 100% of your first payment. No hard questions.</span> <a href="reembolsos.html"><span data-l="es">Ver política</span><span data-l="en">See policy</span></a></div>
+      <p class="note"><span data-l="es">Precios en dólares (USD) para Latinoamérica. El precio se ajusta al nivel de ingresos de cada país y lo ves exacto dentro de Vigía antes de pagar. Pagos seguros con <b>Polar</b> y <b>Stripe</b>; Polar es nuestro distribuidor autorizado y gestiona los impuestos de cada país.</span><span data-l="en">Prices in US dollars (USD) for Latin America. Prices adjust to each country's income level and you see the exact price inside Vigía before paying. Secure payments with <b>Polar</b> and <b>Stripe</b>; Polar is our authorized reseller and handles taxes in every country.</span></p>
+    </div>
+  </section>
+
+  <!-- 11. INVITA Y GANA (crecimiento boca a boca) -->
+  <section class="block" data-sec="invita">
+    <div class="wrap refer">
+      <div>
+        <span class="eyebrow"><span data-l="es">Invita y gana</span><span data-l="en">Invite and earn</span></span>
+        <h2><span data-l="es">Comparte Vigía y gana Premium gratis</span><span data-l="en">Share Vigía and earn free Premium</span></h2>
+        <p class="muted"><span data-l="es">Por cada amigo que instale Vigía con tu código ganas <b>10 días</b> de Premium (hasta 3 amigos) y tu amigo recibe <b>7 días</b> extra. Encuentras tu código en Vigía → Premium.</span><span data-l="en">For every friend who installs Vigía with your code you get <b>10 days</b> of Premium (up to 3 friends) and your friend gets <b>7 extra days</b>. Find your code in Vigía → Premium.</span></p>
+      </div>
+      <div class="share">
+        <p><b><span data-l="es">Cuéntale a alguien que compra por internet:</span><span data-l="en">Tell someone who shops online:</span></b></p>
+        <div class="sbtns">
+          <a class="sbtn wa" data-share="wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+          <a class="sbtn fb" data-share="fb" href="#" target="_blank" rel="noopener">Facebook</a>
+          <a class="sbtn x" data-share="x" href="#" target="_blank" rel="noopener">X</a>
+          <a class="sbtn tg" data-share="tg" href="#" target="_blank" rel="noopener">Telegram</a>
+          <button class="sbtn cp" data-share="copy"><span data-l="es">Copiar enlace</span><span data-l="en">Copy link</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. PREGUNTAS (romper objeciones) -->
+  <section class="block alt" id="preguntas" data-sec="preguntas">
+    <div class="wrap">
+      <div class="head"><span class="eyebrow"><span data-l="es">Preguntas frecuentes</span><span data-l="en">FAQ</span></span><h2><span data-l="es">Lo que más nos preguntan</span><span data-l="en">What people ask most</span></h2></div>
+      <div class="faq">
+        <details open><summary><span data-l="es">¿Vigía es gratis?</span><span data-l="en">Is Vigía free?</span></summary><p><span data-l="es">Sí. El plan gratis protege tus compras para siempre. Al instalar recibes 7 días de Premium completo de regalo, sin tarjeta.</span><span data-l="en">Yes. The free plan protects your purchases forever. When you install you get 7 days of full Premium as a gift, no card needed.</span></p></details>
+        <details><summary><span data-l="es">¿Es seguro? ¿Por qué pide permiso en todos los sitios?</span><span data-l="en">Is it safe? Why does it ask for access to all sites?</span></summary><p><span data-l="es">Porque funciona en cualquier tienda del mundo y no se pueden listar todas por adelantado. Vigía solo lee la información del producto que estás viendo, guarda tus datos en tu navegador y cumple las reglas de la Chrome Web Store.</span><span data-l="en">Because it works on any store in the world and they can't all be listed in advance. Vigía only reads the product you're viewing, keeps your data in your browser and follows Chrome Web Store rules.</span></p></details>
+        <details><summary><span data-l="es">¿Funciona en mi país?</span><span data-l="en">Does it work in my country?</span></summary><p><span data-l="es">La nota, los descuentos falsos y las tiendas dudosas funcionan en cualquier tienda del mundo. La comparación con otras tiendas tiene más de 110 tiendas configuradas en 62 países, y la comunidad agrega más cada semana.</span><span data-l="en">The score, fake discounts and risky stores work on any store in the world. Cross-store comparison has 110+ stores set up in 62 countries, and the community adds more every week.</span></p></details>
+        <details><summary><span data-l="es">¿Cómo activo Premium después de pagar?</span><span data-l="en">How do I activate Premium after paying?</span></summary><p><span data-l="es">Al pagar recibes por correo una clave de licencia. Pégala en Vigía → Premium → Activar y listo.</span><span data-l="en">After paying you receive a license key by email. Paste it in Vigía → Premium → Activate and you're done.</span></p></details>
+        <details><summary><span data-l="es">¿Puedo cancelar?</span><span data-l="en">Can I cancel?</span></summary><p><span data-l="es">Sí, cuando quieras, desde el <a href="https://polar.sh/vigia/portal">portal de clientes</a>. Conservas Premium hasta el final del periodo pagado y tienes garantía de 14 días en tu primer pago.</span><span data-l="en">Yes, anytime, from the <a href="https://polar.sh/vigia/portal">customer portal</a>. You keep Premium until the end of the paid period, and your first payment has a 14-day guarantee.</span></p></details>
+        <details><summary><span data-l="es">¿Cómo gana dinero Vigía?</span><span data-l="en">How does Vigía make money?</span></summary><p><span data-l="es">Con los planes Premium y, cuando te mostramos un precio más bajo, algunas tiendas nos pagan una pequeña comisión si compras desde nuestro enlace. Tu precio no cambia y puedes apagarlo en Ajustes. El <span class="pct">10 %</span> de las ganancias de Premium va a obras benéficas.</span><span data-l="en">Through Premium plans and, when we show you a lower price, some stores pay us a small commission if you buy through our link. Your price doesn't change and you can turn it off in Settings. <span class="pct">10 %</span> of Premium profits goes to charity.</span></p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. CIERRE -->
+  <section class="block">
+    <div class="wrap">
+      <div class="final">
+        <h2><span data-l="es">Tu próxima compra puede salir mejor.</span><span data-l="en">Your next purchase can go better.</span></h2>
+        <p><span data-l="es">Gratis, en 14 idiomas, para cualquier tienda del mundo. Y cada Premium ayuda a alguien más.</span><span data-l="en">Free, in 14 languages, for any store in the world. And every Premium helps someone else.</span></p>
+        <a class="btn big store-link" href="#precios"><span data-l="es">Agregar a Chrome — es gratis</span><span data-l="en">Add to Chrome — it's free</span></a>
+        <p class="micro light"><span data-l="es">🎁 7 días de Premium de regalo · Sin tarjeta</span><span data-l="en">🎁 7 days of Premium as a gift · No card</span></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="mbar"><a class="btn store-link" href="#precios"><span data-l="es">Agregar a Chrome — gratis</span><span data-l="en">Add to Chrome — free</span></a></div>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 Vigía · Colombia · <a href="mailto:vigiacompras.app@gmail.com" class="mail">vigiacompras.app@gmail.com</a></div>
+    <nav>
+      <a href="terminos.html"><span data-l="es">Términos</span><span data-l="en">Terms</span></a>
+      <a href="reembolsos.html"><span data-l="es">Reembolsos</span><span data-l="en">Refunds</span></a>
+      <a href="privacidad.html"><span data-l="es">Privacidad</span><span data-l="en">Privacy</span></a>
+      <a href="https://polar.sh/vigia/portal"><span data-l="es">Mi suscripción</span><span data-l="en">My subscription</span></a>
+    </nav>
+  </div>
+</footer>
+<script src="ajustes.js"></script>
+<script src="sitio.js"></script>
+</body>
+</html>
