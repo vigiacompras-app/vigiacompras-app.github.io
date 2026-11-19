@@ -3,8 +3,8 @@
   const DEF = {
     colores: { marca: '#2F80ED', marcaOscuro: '#1E3A8A', acento: '#E11D74', dorado: '#F5B301' },
     fuente: 'Inter', esquinas: 16, secciones: {}, textos: {}, precios: {},
-    obrasBeneficasPct: 10, tiendaChrome: '', sitio: 'https://vigiacompras-app.github.io',
-    correo: 'vigiacompras.app@gmail.com', redes: {}, blackFriday: '2026-11-27'
+    obrasBeneficasPct: 10, tiendaChrome: '', sitio: 'https://vigiacompras.com',
+    correo: 'soporte@vigiacompras.com', redes: {}, blackFriday: '2026-11-27'
   };
   const merge = (a, b) => { const o = Object.assign({}, a); for (const k in (b || {})) o[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) ? merge(a[k] || {}, b[k]) : b[k]; return o; };
   let S = merge(DEF, window.VIGIA_SITE || {});
