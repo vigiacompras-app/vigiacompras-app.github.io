@@ -49,7 +49,7 @@ window.VIGIA_SITE = {
 
   // Datos generales
   obrasBeneficasPct: 10,                         // % de ganancias de Premium para obras benéficas
-  tiendaChrome: '',                              // enlace de Vigía en la Chrome Web Store (cuando esté publicada)
+  tiendaChrome: 'https://chromewebstore.google.com/detail/mgohniechhonhcphkncfinadfdncldnc',                              // enlace de Vigía en la Chrome Web Store (cuando esté publicada)
   sitio: 'https://vigiacompras.com',             // dirección de esta página
   correo: 'soporte@vigiacompras.com',            // correo de soporte
   redes: { instagram: '', tiktok: '', youtube: '', facebook: '' },
