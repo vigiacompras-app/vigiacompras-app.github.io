@@ -1,11 +1,34 @@
 (function () {
   const $ = id => document.getElementById(id);
   const ORIG = JSON.parse(JSON.stringify(window.VIGIA_SITE || {}));
-  const SECS = { promo: 'Aviso de Black Friday', cifras: 'Cifras (países, tiendas, idiomas)', problema: 'El problema y tabla comparativa', funciones: 'Funciones', como: 'Cómo funciona y capturas', calculadora: 'Calculadora de ahorro', principios: 'Nuestros principios', comparte: 'Vigía Comparte (obras benéficas)', carta: 'Carta del creador', invita: 'Invita y gana', preguntas: 'Preguntas frecuentes' };
+  const SECS = { promo: 'Aviso de Black Friday', cifras: 'Cifras (países, tiendas, idiomas)', problema: 'El problema y tabla comparativa', funciones: 'Funciones', como: 'Cómo funciona y capturas', calculadora: 'Calculadora de ahorro', principios: 'Nuestros principios', comparte: 'Vigía Comparte (obras benéficas)', carta: 'Carta del creador', celular: 'Vigía en el celular (Telegram y apps)', invita: 'Invita y gana', preguntas: 'Preguntas frecuentes' };
   const PLANS = { esencial: 'Esencial', plus: 'Plus', familia: 'Familia', emprendedor: 'Emprendedor', pyme: 'Pyme', corporativo: 'Corporativo' };
   let lang = 'es';
   $('secs').innerHTML = Object.entries(SECS).map(([k, l]) => `<label><input type="checkbox" data-sec="${k}"> ${l}</label>`).join('');
   $('prs').innerHTML = Object.entries(PLANS).map(([k, l]) => `<span>${l}</span><input type="number" step="0.01" min="0" data-pm="${k}"><input type="number" step="0.01" min="0" data-py="${k}">`).join('');
+  $('lks').innerHTML = Object.entries(PLANS).map(([k, l]) => `<label>${l} · mensual <input type="url" data-lm="${k}" placeholder="https://buy.polar.sh/…"></label><label>${l} · anual <input type="url" data-ly="${k}" placeholder="https://buy.polar.sh/…"></label>`).join('');
+  // Precios y enlaces de las tres regiones (el formulario muestra una a la vez)
+  let PR = { alto: {}, medio: {}, bajo: {} }, LK = {}, REG = 'medio';
+  function normPrices(p) {
+    p = p || {};
+    if (p.alto || p.medio || p.bajo) return { alto: { ...(p.alto || {}) }, medio: { ...(p.medio || {}) }, bajo: { ...(p.bajo || {}) } };
+    return { alto: {}, medio: { ...p }, bajo: {} }; // formato antiguo: un solo precio
+  }
+  function showRegion() {
+    Object.keys(PLANS).forEach(k => {
+      const v = PR[REG][k] || ['', ''];
+      document.querySelector(`[data-pm="${k}"]`).value = v[0]; document.querySelector(`[data-py="${k}"]`).value = v[1];
+      document.querySelector(`[data-lm="${k}"]`).value = LK[`${k}-${REG}`] || ''; document.querySelector(`[data-ly="${k}"]`).value = LK[`${k}-${REG}-anual`] || '';
+    });
+  }
+  function keepRegion() {
+    Object.keys(PLANS).forEach(k => {
+      PR[REG][k] = [+document.querySelector(`[data-pm="${k}"]`).value || 0, +document.querySelector(`[data-py="${k}"]`).value || 0];
+      LK[`${k}-${REG}`] = document.querySelector(`[data-lm="${k}"]`).value.trim(); LK[`${k}-${REG}-anual`] = document.querySelector(`[data-ly="${k}"]`).value.trim();
+    });
+  }
+  $('reg').addEventListener('change', () => { keepRegion(); REG = $('reg').value; showRegion(); $('pv').src = 'index.html?region=' + REG + '#precios'; });
+  const list = v => String(v || '').toUpperCase().split(/[^A-Z]+/).filter(x => x.length === 2);
 
   function fill(S) {
     const c = S.colores || {};
@@ -13,7 +36,10 @@
     $('fuente').value = S.fuente || 'Inter'; $('esquinas').value = S.esquinas ?? 16;
     const t = S.textos || {}; ['titulo_es', 'titulo_en', 'subtitulo_es', 'subtitulo_en', 'firma'].forEach(k => { $(k).value = t[k] || ''; });
     document.querySelectorAll('[data-sec]').forEach(i => { i.checked = (S.secciones || {})[i.dataset.sec] !== false; });
-    const p = S.precios || {}; Object.keys(PLANS).forEach(k => { const v = p[k] || ['', '']; document.querySelector(`[data-pm="${k}"]`).value = v[0]; document.querySelector(`[data-py="${k}"]`).value = v[1]; });
+    PR = normPrices(S.precios); LK = { ...((S.compra || {}).enlaces || {}) }; showRegion();
+    $('compra_on').checked = !S.compra || S.compra.activo !== false;
+    const rg = S.regiones || {}; $('reg_alto').value = (rg.alto || []).join(', '); $('reg_bajo').value = (rg.bajo || []).join(', ');
+    const ap = S.apps || {}; ['telegram', 'android', 'ios'].forEach(k => { $('a_' + k).value = ap[k] || ''; });
     ['obrasBeneficasPct', 'tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { $(k).value = S[k] ?? ''; });
     const r = S.redes || {}; ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { $('r_' + k).value = r[k] || ''; });
   }
@@ -23,7 +49,10 @@
     S.fuente = $('fuente').value; S.esquinas = +$('esquinas').value;
     document.querySelectorAll('[data-sec]').forEach(i => { S.secciones[i.dataset.sec] = i.checked; });
     ['titulo_es', 'titulo_en', 'subtitulo_es', 'subtitulo_en', 'firma'].forEach(k => { S.textos[k] = $(k).value.trim(); });
-    Object.keys(PLANS).forEach(k => { S.precios[k] = [+document.querySelector(`[data-pm="${k}"]`).value || 0, +document.querySelector(`[data-py="${k}"]`).value || 0]; });
+    keepRegion(); S.precios = JSON.parse(JSON.stringify(PR));
+    S.compra = { activo: $('compra_on').checked, enlaces: { ...LK } };
+    S.regiones = { alto: list($('reg_alto').value), bajo: list($('reg_bajo').value) };
+    S.apps = {}; ['telegram', 'android', 'ios'].forEach(k => { S.apps[k] = $('a_' + k).value.trim(); });
     S.obrasBeneficasPct = Math.max(0, Math.min(100, +$('obrasBeneficasPct').value || 0));
     ['tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { S[k] = $(k).value.trim(); });
     ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { S.redes[k] = $('r_' + k).value.trim(); });
@@ -36,7 +65,8 @@
   function fileText(S) {
     const J = v => JSON.stringify(v);
     const sec = Object.entries(S.secciones).map(([k, v]) => `    ${k}: ${v}`).join(',\n');
-    const pr = Object.entries(S.precios).map(([k, v]) => `${k}: [${v[0]}, ${v[1]}]`).join(', ');
+    const tierTxt = t => '{ ' + Object.entries(S.precios[t] || {}).map(([k, v]) => `${k}: [${v[0]}, ${v[1]}]`).join(', ') + ' }';
+    const lk = Object.entries(S.compra.enlaces).filter(([, v]) => v).map(([k, v]) => `      ${J(k)}: ${J(v)}`).join(',\n');
     return `// =====================================================================
 //  AJUSTES DE LA PÁGINA DE VIGÍA — creado con editor.html el ${new Date().toLocaleString('es-CO')}
 //  Súbelo a GitHub reemplazando ajustes.js. La página se actualiza en 1–2 minutos.
@@ -55,7 +85,22 @@ ${sec}
     subtitulo_en: ${J(S.textos.subtitulo_en)},
     firma: ${J(S.textos.firma)}
   },
-  precios: { ${pr} },
+  precios: {
+    alto: ${tierTxt('alto')},
+    medio: ${tierTxt('medio')},
+    bajo: ${tierTxt('bajo')}
+  },
+  regiones: {
+    alto: ${J(S.regiones.alto)},
+    bajo: ${J(S.regiones.bajo)}
+  },
+  compra: {
+    activo: ${S.compra.activo},
+    enlaces: {
+${lk}
+    }
+  },
+  apps: { telegram: ${J(S.apps.telegram)}, android: ${J(S.apps.android)}, ios: ${J(S.apps.ios)} },
   obrasBeneficasPct: ${S.obrasBeneficasPct},
   tiendaChrome: ${J(S.tiendaChrome)},
   sitio: ${J(S.sitio)},

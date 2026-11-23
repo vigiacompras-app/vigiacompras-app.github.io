@@ -79,8 +79,23 @@
       <div class="checks" id="secs"></div>
     </details>
 
-    <details><summary>💲 Precios (USD)</summary>
+    <details><summary>💲 Precios y pagos (USD)</summary>
+      <p class="hint">Cada visitante ve el precio de su país, igual que en la extensión. Elige la región para ver o cambiar sus precios y sus enlaces de pago de Polar.</p>
+      <label>Región <select id="reg"><option value="alto">Alto (EE. UU., Europa, Golfo…)</option><option value="medio" selected>Medio (Colombia, México… y el resto)</option><option value="bajo">Bajo (India, Centroamérica…)</option></select></label>
       <div class="prices"><b>Plan</b><b>Mensual</b><b>Anual</b><div id="prs" style="display:contents"></div></div>
+      <div class="checks" style="margin-top:12px"><label><input type="checkbox" id="compra_on"> Mostrar «o cómpralo ya →» (pago directo en Polar)</label></div>
+      <details style="margin-top:10px"><summary style="font-weight:600">Enlaces de pago de Polar (región elegida)</summary><div id="lks"></div></details>
+      <details style="margin-top:10px"><summary style="font-weight:600">Países de cada región</summary>
+        <label>Región alta <small>Códigos de 2 letras separados por coma</small><textarea id="reg_alto"></textarea></label>
+        <label>Región baja <small>Los países que no estén en ninguna lista pagan «medio»</small><textarea id="reg_bajo"></textarea></label>
+      </details>
+    </details>
+
+    <details><summary>📱 Vigía en el celular</summary>
+      <p class="hint">Si un enlace está vacío, el botón dice «Muy pronto». Cuando publiques la app, pega aquí su enlace.</p>
+      <label>Bot de Telegram <input type="url" id="a_telegram" placeholder="https://t.me/VigiaComprasBot"></label>
+      <label>App Android (Google Play) <input type="url" id="a_android" placeholder="https://play.google.com/store/apps/details?id=…"></label>
+      <label>App iPhone (App Store) <input type="url" id="a_ios" placeholder="https://apps.apple.com/…"></label>
     </details>
 
     <details><summary>🔗 Enlaces y datos</summary>

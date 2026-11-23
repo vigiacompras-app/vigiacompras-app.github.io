@@ -3,11 +3,36 @@
   const DEF = {
     colores: { marca: '#2F80ED', marcaOscuro: '#1E3A8A', acento: '#E11D74', dorado: '#F5B301' },
     fuente: 'Inter', esquinas: 16, secciones: {}, textos: {}, precios: {},
+    regiones: { alto: [], bajo: [] }, compra: { activo: true, enlaces: {} }, apps: {},
     obrasBeneficasPct: 10, tiendaChrome: '', sitio: 'https://vigiacompras.com',
     correo: 'soporte@vigiacompras.com', redes: {}, blackFriday: '2026-11-27'
   };
   const merge = (a, b) => { const o = Object.assign({}, a); for (const k in (b || {})) o[k] = (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) ? merge(a[k] || {}, b[k]) : b[k]; return o; };
   let S = merge(DEF, window.VIGIA_SITE || {});
+
+  // ----- Región de precios (igual que la extensión: alto / medio / bajo según el país) -----
+  const TZC = { 'America/Bogota': 'CO', 'America/Mexico_City': 'MX', 'America/Monterrey': 'MX', 'America/Tijuana': 'MX', 'America/Cancun': 'MX', 'America/Santiago': 'CL', 'America/Lima': 'PE', 'America/Guayaquil': 'EC', 'America/Caracas': 'VE', 'America/Montevideo': 'UY', 'America/Asuncion': 'PY', 'America/La_Paz': 'BO', 'America/Costa_Rica': 'CR', 'America/Panama': 'PA', 'America/Guatemala': 'GT', 'America/El_Salvador': 'SV', 'America/Tegucigalpa': 'HN', 'America/Managua': 'NI', 'America/Santo_Domingo': 'DO', 'America/Puerto_Rico': 'PR', 'America/Sao_Paulo': 'BR', 'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US', 'America/Phoenix': 'US', 'America/Toronto': 'CA', 'America/Vancouver': 'CA', 'Europe/Madrid': 'ES', 'Europe/Lisbon': 'PT', 'Europe/Paris': 'FR', 'Europe/Berlin': 'DE', 'Europe/Rome': 'IT', 'Europe/London': 'GB', 'Europe/Amsterdam': 'NL', 'Europe/Zurich': 'CH', 'Europe/Oslo': 'NO', 'Europe/Stockholm': 'SE', 'Atlantic/Reykjavik': 'IS', 'Asia/Dubai': 'AE', 'Asia/Riyadh': 'SA', 'Asia/Qatar': 'QA', 'Asia/Kolkata': 'IN', 'Asia/Tokyo': 'JP', 'Australia/Sydney': 'AU' };
+  function guessCountry() {
+    try { const q = new URLSearchParams(location.search).get('pais'); if (q && /^[a-z]{2}$/i.test(q)) return q.toUpperCase(); } catch (e) {}
+    try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; if (TZC[tz]) return TZC[tz]; if (tz.startsWith('America/Argentina')) return 'AR'; } catch (e) {}
+    const m = (navigator.languages || [navigator.language || '']).join(' ').match(/-([A-Z]{2})\b/);
+    return m ? m[1] : '';
+  }
+  const COUNTRY = guessCountry();
+  function tier() {
+    try { const q = new URLSearchParams(location.search).get('region'); if (['alto', 'medio', 'bajo'].includes(q)) return q; } catch (e) {}
+    const r = S.regiones || {};
+    if ((r.alto || []).includes(COUNTRY)) return 'alto';
+    if ((r.bajo || []).includes(COUNTRY)) return 'bajo';
+    return 'medio';
+  }
+  // Precios: formato nuevo { alto: {plan: [mes, año]}, medio: …, bajo: … } o el antiguo { plan: [mes, año] }
+  function priceOf(plan) {
+    const p = S.precios || {}, t = tier();
+    if (p[t] && p[t][plan]) return p[t][plan];
+    if (p.medio && p.medio[plan]) return p.medio[plan];
+    return Array.isArray(p[plan]) ? p[plan] : null;
+  }
 
   const html = document.documentElement;
   const $$ = s => document.querySelectorAll(s);
@@ -37,7 +62,8 @@
       el.innerHTML = v ? esc(v).replace(/\*([^*]+)\*/g, '<em>$1</em>') : FACT[box.dataset.txt + '_' + el.dataset.l];
     }));
     $$('.firma').forEach(el => { el.textContent = S.textos.firma || 'Santiago'; });
-    $$('.price[data-p]').forEach(el => { const p = S.precios[el.dataset.p]; if (p) { el.dataset.m = p[0]; el.dataset.y = p[1]; } });
+    $$('.price[data-p]').forEach(el => { const p = priceOf(el.dataset.p); if (p) { el.dataset.m = p[0]; el.dataset.y = p[1]; } });
+    apps();
     $$('.pct').forEach(b => { b.textContent = S.obrasBeneficasPct + ' %'; });
     $$('a.mail').forEach(a => { a.href = 'mailto:' + S.correo; a.textContent = S.correo; });
     const soc = document.getElementById('social');
@@ -56,7 +82,7 @@
     html.dataset.lang = lang; html.lang = lang;
     $$('[data-set]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.set === lang)));
     try { localStorage.setItem('vigia-lang', lang); } catch (e) {}
-    setPer(per); calc(); promo(); shareLinks();
+    setPer(per); calc(); promo(); shareLinks(); apps();
   }
   $$('[data-set]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.set)));
 
@@ -67,6 +93,36 @@
     $$('[data-per]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.per === per)));
     const unit = per === 'm' ? T('/mes', '/mo') : T('/año', '/yr');
     $$('.price[data-m]').forEach(el => { el.innerHTML = money(per === 'm' ? el.dataset.m : el.dataset.y) + ` <span class="per">${unit}</span>`; });
+    buyLinks();
+  }
+  // ----- "Cómpralo ya": pago directo en Polar con el plan, la región y el periodo elegidos -----
+  function buyLinks() {
+    const c = S.compra || {}, t = tier();
+    $$('[data-buy]').forEach(a => {
+      const url = (c.enlaces || {})[a.dataset.buy + '-' + t + (per === 'y' ? '-anual' : '')] || '';
+      const ok = c.activo !== false && /^https:\/\//.test(url);
+      a.hidden = !ok;
+      if (ok) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+    });
+    const rn = document.getElementById('regnote');
+    if (rn) {
+      let name = '';
+      try { if (COUNTRY) name = new Intl.DisplayNames([lang], { type: 'region' }).of(COUNTRY); } catch (e) {}
+      rn.textContent = name ? T(`Precios para ${name}.`, `Prices for ${name}.`) : '';
+    }
+  }
+  // ----- Vigía en el celular: botones solo con enlaces reales -----
+  function apps() {
+    const A = S.apps || {};
+    $$('[data-app]').forEach(a => {
+      const url = A[a.dataset.app] || '';
+      const ok = /^https:\/\//.test(url);
+      a.classList.toggle('soon', !ok);
+      if (ok) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('aria-disabled'); }
+      else { a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true'); }
+      const st = a.querySelector('.st');
+      if (st) st.textContent = ok ? (a.dataset.app === 'telegram' ? T('Abrir en Telegram', 'Open in Telegram') : T('Descargar', 'Download')) : T('Muy pronto', 'Coming soon');
+    });
   }
   $$('[data-per]').forEach(b => b.addEventListener('click', () => setPer(b.dataset.per)));
 
@@ -80,7 +136,7 @@
     if (!cur) return;
     const c = cur.value, s = Math.max(0, +spend.value || 0), p = +pct.value;
     document.getElementById('pctv').textContent = p + ' %';
-    const save = s * 12 * p / 100, plus = ((S.precios.plus || [4.99, 49.9])[1]) * RATE[c];
+    const save = s * 12 * p / 100, plus = ((priceOf('plus') || [4.99, 49.9])[1]) * RATE[c];
     document.getElementById('save').textContent = fmt(save, c);
     document.getElementById('roi').textContent = save > plus
       ? T(`Vigía Plus cuesta cerca de ${fmt(plus, c)} al año: el ahorro sería unas ${Math.max(1, Math.round(save / plus))} veces lo que pagas.`, `Vigía Plus costs about ${fmt(plus, c)} a year: savings would be about ${Math.max(1, Math.round(save / plus))}× what you pay.`)
