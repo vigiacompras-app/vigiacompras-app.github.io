@@ -15,6 +15,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="logo-512.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vigía">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="estilo.css">
@@ -36,6 +39,7 @@
   <div class="wrap">
     <a class="brand" href="./"><img src="logo.svg" alt="">Vigía</a>
     <nav>
+      <a href="#herramientas" data-sec="herramientas"><span data-l="es">Úsalo ya</span><span data-l="en">Use it now</span></a>
       <a href="#funciones"><span data-l="es">Funciones</span><span data-l="en">Features</span></a>
       <a href="#ahorro"><span data-l="es">¿Cuánto ahorras?</span><span data-l="en">Your savings</span></a>
       <a href="#comparte" data-sec="comparte"><span data-l="es">Vigía Comparte</span><span data-l="en">Vigía Gives</span></a>
@@ -242,6 +246,17 @@
     </div>
   </section>
 
+  <!-- 1b. VIGÍA EN LA WEB: herramientas para usar sin instalar nada -->
+  <section class="block alt" id="herramientas" data-sec="herramientas">
+    <div class="wrap">
+      <div class="head"><span class="eyebrow"><span data-l="es">Sin instalar nada</span><span data-l="en">Nothing to install</span></span>
+        <h2><span data-l="es">Usa Vigía aquí mismo, también desde el celular</span><span data-l="en">Use Vigía right here, from your phone too</span></h2>
+        <p><span data-l="es">Compara un producto en todas las tiendas de tu país, busca vuelos y hoteles en varias páginas a la vez y descubre el precio real con maletas. Gratis.</span><span data-l="en">Compare a product across every store in your country, search flights and hotels on several sites at once and find the real price with bags. Free.</span></p></div>
+      <div class="vtools" id="vtools"></div>
+      <p class="hint" style="text-align:center;margin-top:12px"><a href="app.html"><span data-l="es">Abrir Vigía en pantalla completa →</span><span data-l="en">Open Vigía full screen →</span></a></p>
+    </div>
+  </section>
+
   <!-- 10b. VIGÍA EN EL CELULAR -->
   <section class="block" data-sec="celular" id="celular">
     <div class="wrap">
@@ -320,6 +335,9 @@
   </div>
 </footer>
 <script src="ajustes.js"></script>
+<script src="vigia-tiendas.js"></script>
+<script src="vigia-viajes.js"></script>
 <script src="sitio.js"></script>
+<script src="herramientas.js"></script>
 </body>
 </html>

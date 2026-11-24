@@ -1,10 +1,12 @@
 (function () {
   const $ = id => document.getElementById(id);
   const ORIG = JSON.parse(JSON.stringify(window.VIGIA_SITE || {}));
-  const SECS = { promo: 'Aviso de Black Friday', cifras: 'Cifras (países, tiendas, idiomas)', problema: 'El problema y tabla comparativa', funciones: 'Funciones', como: 'Cómo funciona y capturas', calculadora: 'Calculadora de ahorro', principios: 'Nuestros principios', comparte: 'Vigía Comparte (obras benéficas)', carta: 'Carta del creador', celular: 'Vigía en el celular (Telegram y apps)', invita: 'Invita y gana', preguntas: 'Preguntas frecuentes' };
+  const SECS = { promo: 'Aviso de Black Friday', cifras: 'Cifras (países, tiendas, idiomas)', problema: 'El problema y tabla comparativa', funciones: 'Funciones', como: 'Cómo funciona y capturas', calculadora: 'Calculadora de ahorro', principios: 'Nuestros principios', comparte: 'Vigía Comparte (obras benéficas)', carta: 'Carta del creador', herramientas: 'Úsalo ya: herramientas de Vigía en la web', celular: 'Vigía en el celular (Telegram y apps)', invita: 'Invita y gana', preguntas: 'Preguntas frecuentes' };
+  const TOOLS = { comparar: 'Comparar un producto', vuelos: 'Buscar vuelos', hoteles: 'Buscar hoteles', precioReal: 'Precio real del vuelo (maletas)', descuento: '¿Descuento real?', app: 'Botón «Instalar Vigía en el celular»' };
   const PLANS = { esencial: 'Esencial', plus: 'Plus', familia: 'Familia', emprendedor: 'Emprendedor', pyme: 'Pyme', corporativo: 'Corporativo' };
   let lang = 'es';
   $('secs').innerHTML = Object.entries(SECS).map(([k, l]) => `<label><input type="checkbox" data-sec="${k}"> ${l}</label>`).join('');
+  $('tools').innerHTML = Object.entries(TOOLS).map(([k, l]) => `<label><input type="checkbox" data-tool="${k}"> ${l}</label>`).join('');
   $('prs').innerHTML = Object.entries(PLANS).map(([k, l]) => `<span>${l}</span><input type="number" step="0.01" min="0" data-pm="${k}"><input type="number" step="0.01" min="0" data-py="${k}">`).join('');
   $('lks').innerHTML = Object.entries(PLANS).map(([k, l]) => `<label>${l} · mensual <input type="url" data-lm="${k}" placeholder="https://buy.polar.sh/…"></label><label>${l} · anual <input type="url" data-ly="${k}" placeholder="https://buy.polar.sh/…"></label>`).join('');
   // Precios y enlaces de las tres regiones (el formulario muestra una a la vez)
@@ -40,6 +42,7 @@
     $('compra_on').checked = !S.compra || S.compra.activo !== false;
     const rg = S.regiones || {}; $('reg_alto').value = (rg.alto || []).join(', '); $('reg_bajo').value = (rg.bajo || []).join(', ');
     const ap = S.apps || {}; ['telegram', 'android', 'ios'].forEach(k => { $('a_' + k).value = ap[k] || ''; });
+    document.querySelectorAll('[data-tool]').forEach(i => { i.checked = (S.herramientas || {})[i.dataset.tool] !== false; });
     ['obrasBeneficasPct', 'tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { $(k).value = S[k] ?? ''; });
     const r = S.redes || {}; ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { $('r_' + k).value = r[k] || ''; });
   }
@@ -53,6 +56,7 @@
     S.compra = { activo: $('compra_on').checked, enlaces: { ...LK } };
     S.regiones = { alto: list($('reg_alto').value), bajo: list($('reg_bajo').value) };
     S.apps = {}; ['telegram', 'android', 'ios'].forEach(k => { S.apps[k] = $('a_' + k).value.trim(); });
+    S.herramientas = {}; document.querySelectorAll('[data-tool]').forEach(i => { S.herramientas[i.dataset.tool] = i.checked; });
     S.obrasBeneficasPct = Math.max(0, Math.min(100, +$('obrasBeneficasPct').value || 0));
     ['tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { S[k] = $(k).value.trim(); });
     ['instagram', 'tiktok', 'youtube', 'facebook'].forEach(k => { S.redes[k] = $('r_' + k).value.trim(); });
@@ -100,6 +104,7 @@ ${sec}
 ${lk}
     }
   },
+  herramientas: { ${Object.entries(S.herramientas).map(([k, v]) => k + ': ' + v).join(', ')} },
   apps: { telegram: ${J(S.apps.telegram)}, android: ${J(S.apps.android)}, ios: ${J(S.apps.ios)} },
   obrasBeneficasPct: ${S.obrasBeneficasPct},
   tiendaChrome: ${J(S.tiendaChrome)},

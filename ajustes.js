@@ -27,6 +27,7 @@ window.VIGIA_SITE = {
     principios: true,
     comparte: true,     // Vigía Comparte (obras benéficas)
     carta: true,        // carta del creador
+    herramientas: true, // Vigía en la web: comparar, vuelos, hoteles, precio real y descuentos (sin instalar)
     celular: true,      // Vigía en el celular (Telegram y apps)
     invita: true,       // invita y gana + botones para compartir
     preguntas: true
@@ -50,7 +51,7 @@ window.VIGIA_SITE = {
   },
   // Países de cada región (código de 2 letras). Los que no estén en ninguna lista pagan "medio".
   regiones: {
-    alto: ['US', 'CA', 'GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'IE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'LU', 'AU', 'NZ', 'JP', 'KR', 'SG', 'HK', 'TW', 'AE', 'SA', 'QA', 'KW', 'IL', 'PR'],
+    alto: ['US', 'CA', 'GB', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'IE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI', 'PT', 'LU', 'AU', 'NZ', 'JP', 'KR', 'SG', 'HK', 'TW', 'AE', 'SA', 'QA', 'KW', 'IL', 'PR', 'IS', 'BH', 'OM'],
     bajo: ['IN', 'ID', 'PH', 'VN', 'TH', 'MY', 'EG', 'NG', 'KE', 'GH', 'ZA', 'MA', 'PK', 'BD', 'LK', 'NP', 'BO', 'NI', 'HN', 'GT', 'SV', 'VE', 'CU', 'HT']
   },
 
@@ -96,6 +97,9 @@ window.VIGIA_SITE = {
       'corporativo-bajo-anual': 'https://buy.polar.sh/polar_cl_rQgk1m8CoZoV3WsShnqYPOItQvLlodcYq3hKh18Yv7m'
     }
   },
+
+  // Herramientas de Vigía en la web (sección "Úsalo ya" y la app del celular app.html). true = se muestra
+  herramientas: { comparar: true, vuelos: true, hoteles: true, precioReal: true, descuento: true, app: true },
 
   // Vigía en el celular. Si un enlace está vacío, el botón dice "Muy pronto".
   apps: {
