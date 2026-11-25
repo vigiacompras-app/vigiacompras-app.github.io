@@ -382,7 +382,8 @@
   // ---------- 1.0: la lista de vuelos de la página (tipo Rift): aerolínea, horarios, duración, escalas y precio ----------
   const AIRLINES = /\b(Avianca|LATAM|American(?: Airlines)?|United|Delta|Copa(?: Airlines)?|Wingo|JetSMART|JetBlue|Spirit|Frontier|Southwest|Alaska|Iberia|Air Europa|Aerom[eé]xico|Volaris|Viva ?Aerobus|Satena|Clic|Arajet|Emirates|Turkish(?: Airlines)?|Lufthansa|Air France|KLM|British Airways|GOL|Azul|SKY(?: Airline)?|Air Canada|Qatar Airways|Etihad|Aerol[ií]neas Argentinas|Flybondi|Paranair|Boliviana|Conviasa|Laser|Plus Ultra|TAP(?: Air Portugal)?|Vueling|Ryanair|easyJet|Interjet|Avior|Estelar|Sky High|Condor|Edelweiss|Swiss|ITA Airways|Aeroitalia)\b/gi;
   const CODE_RE = /\b(COP|MXN|ARS|CLP|PEN|BRL|USD|EUR|GBP|CAD|AUD|UYU|PYG|BOB|CRC|GTQ|DOP|JPY|KRW|INR|AED|SAR|CHF|SEK|NOK|DKK)\b/;
-  const PRICE_RE = /(?:US\$|COP|MXN|ARS|CLP|PEN|BRL|USD|EUR|GBP|R\$|S\/|\$|€|£)\s?(\d{1,3}(?:[.,\s]\d{3})+(?:[.,]\d{1,2})?|\d{2,7}(?:[.,]\d{1,2})?)/;
+  // "$ 1.979.952", "COP 1,979,952" y también con la moneda al final ("2.157.870 COP", Google Vuelos; "49,99 €")
+  const PRICE_RE = /(?:US\$|COP|MXN|ARS|CLP|PEN|BRL|USD|EUR|GBP|R\$|S\/|\$|€|£)\s?(\d{1,3}(?:[.,\s]\d{3})+(?:[.,]\d{1,2})?|\d{2,7}(?:[.,]\d{1,2})?)|(\d{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?|\d{2,7}(?:[.,]\d{1,2})?)\s?(?:COP|MXN|ARS|CLP|PEN|BRL|USD|EUR|GBP|€)\b/;
   const TIME_RE = /\b([01]?\d|2[0-3]):([0-5]\d)(?:\s*(a\.?\s?m\.?|p\.?\s?m\.?))?/gi;
   const DUR_RE = /\b(\d{1,2})\s?h(?:rs?|oras?)?\s?(?:(\d{1,2})\s?m(?:in)?)?\b/gi;
   const STOP_RE = /\b(directo|direct[oa]?|nonstop|non-stop|sin escalas|sem escalas|direto)\b|\b(\d)\s*(?:escalas?|stops?|paradas?)\b/gi;
@@ -390,7 +391,7 @@
   function parseFlightCard(el) {
     const text = String(el.innerText || el.textContent || '').replace(/ /g, ' ');
     const pm = PRICE_RE.exec(text); if (!pm) return null;
-    const price = num(pm[1]); if (!price) return null;
+    const price = num(pm[1] || pm[2]); if (!price) return null;
     const cm = CODE_RE.exec(pm[0]) || CODE_RE.exec(text);
     const times = []; let m; TIME_RE.lastIndex = 0;
     while ((m = TIME_RE.exec(text)) && times.length < 8) times.push(hhmm(m[1], m[2], m[3]));

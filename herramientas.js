@@ -136,6 +136,12 @@
     if (ios) { const s = box.querySelector('[data-ios]'); if (s) s.hidden = false; }
     if (!swDone && 'serviceWorker' in navigator && location.protocol === 'https:') { swDone = true; navigator.serviceWorker.register('sw.js').catch(() => {}); }
   }
+  // Llega desde el bot de Telegram (app.html?q=producto): la búsqueda queda lista
+  try {
+    const q0 = new URLSearchParams(location.search).get('q');
+    const f0 = box.querySelector('[data-f="comparar"]');
+    if (q0 && f0 && !box.dataset.qDone) { box.dataset.qDone = '1'; f0.elements.q.value = q0.slice(0, 200); f0.requestSubmit ? f0.requestSubmit() : f0.dispatchEvent(new Event('submit', { cancelable: true })); }
+  } catch (e) {}
   }
   init();
   // Vista previa del editor (editor.html): vuelve a dibujar las herramientas con lo que vas cambiando
