@@ -10,6 +10,8 @@
   box.hidden = false;
   const S = window.VIGIA_SITE || {};
   const H = Object.assign({ comparar: true, vuelos: true, hoteles: true, precioReal: true, descuento: true, app: true }, S.herramientas || {});
+  // Una página puede mostrar solo algunas herramientas: <div id="vtools" data-only="vuelos,hoteles,real">
+  if (box.dataset.only) { const only = box.dataset.only.split(',').map(s => s.trim()); ['comparar', 'vuelos', 'hoteles', 'descuento'].forEach(k => { if (!only.includes(k)) H[k] = false; }); if (!only.includes('real')) H.precioReal = false; H.app = false; }
   const ST = window.VigiaStores, TV = window.VigiaTravel;
   const L = (es, en) => `<span data-l="es">${es}</span><span data-l="en">${en}</span>`;
   const lang = () => document.documentElement.dataset.lang === 'en' ? 'en' : 'es';
