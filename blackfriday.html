@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es" data-lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Black Friday con Vigía — solo descuentos de verdad</title>
+<meta name="description" content="Black Friday sin trampas: ofertas por categoría, vuelos en promoción y un verificador para saber si un descuento es real. Gratis.">
+<meta property="og:title" content="Black Friday con Vigía — solo descuentos de verdad">
+<meta property="og:description" content="Ofertas por categoría, vuelos en promoción y un verificador de descuentos falsos. Gratis.">
+<meta property="og:image" content="https://vigiacompras.com/og-vigia.png">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .bf-hero { padding: 56px 0 36px; background: radial-gradient(900px 420px at 85% -10%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 70%), radial-gradient(900px 420px at 0% 0%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 70%); }
+  .bf-hero h1 { font-size: clamp(32px, 5vw, 50px); line-height: 1.08; letter-spacing: -.02em; margin: 12px 0; }
+  .bf-hero p { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0 0 22px; }
+  .bf-tag { display: inline-block; background: #111; color: #FFD54A; font-weight: 800; padding: 6px 12px; border-radius: 999px; font-size: 13px; letter-spacing: .04em; }
+  .bf-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 18px; }
+  .bf-cat { display: flex; flex-direction: column; gap: 6px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r, 16px); background: var(--card); color: var(--ink); text-decoration: none; font-weight: 700; transition: border-color .15s, transform .15s; }
+  .bf-cat:hover { border-color: var(--brand); transform: translateY(-2px); }
+  .bf-cat small { color: var(--muted); font-weight: 500; }
+  .bf-cat .ic { font-size: 26px; }
+  .bf-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .bf-tips { counter-reset: t; list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 10px; }
+  .bf-tips li { counter-increment: t; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 12px 48px; position: relative; }
+  .bf-tips li::before { content: counter(t); position: absolute; left: 14px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--brand); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 13px; }
+  .bf-note { font-size: 13px; color: var(--muted); margin-top: 14px; }
+  @media (max-width: 640px) { .bf-hero { padding: 36px 0 24px; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="./"><img src="logo.svg" alt="">Vigía</a>
+<nav><a href="./#funciones"><span data-l="es">Funciones</span><span data-l="en">Features</span></a><a href="app.html"><span data-l="es">App</span><span data-l="en">App</span></a></nav>
+<div class="langs"><button data-set="es" aria-pressed="true">ES</button><button data-set="en" aria-pressed="false">EN</button></div></div></header>
+
+<main>
+<section class="bf-hero"><div class="wrap">
+  <span class="bf-tag">BLACK FRIDAY · <span data-bf-when></span></span>
+  <h1><span data-l="es">Black Friday sin trampas: compra solo los descuentos <em>de verdad</em></span><span data-l="en">Black Friday without tricks: buy only the <em>real</em> deals</span></h1>
+  <p><span data-l="es">Muchas "ofertas" suben el precio días antes para luego "rebajarlo". Aquí tienes las mejores categorías para buscar, vuelos en promoción y un verificador para no caer.</span><span data-l="en">Many "deals" raise the price days before to then "discount" it. Here are the best categories to browse, flight deals and a checker so you don't fall for it.</span></p>
+  <div class="bf-row">
+    <a class="btn big store-link" href="./#precios"><span data-l="es">Instala Vigía gratis: te avisa si el descuento es falso</span><span data-l="en">Get Vigía free: it warns you about fake deals</span></a>
+    <a class="btn ghost big" data-tg href="https://t.me/VigiaComprasBot" target="_blank" rel="noopener">✈️ <span data-l="es">Ofertas en Telegram</span><span data-l="en">Deals on Telegram</span></a>
+  </div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <h2><span data-l="es">🛍️ Ofertas de Black Friday por categoría</span><span data-l="en">🛍️ Black Friday deals by category</span></h2>
+  <p class="muted"><span data-l="es">Abre la categoría y compara el precio TOTAL (con envío e impuestos a tu país) antes de pagar. Amazon envía a Colombia y a casi toda Latinoamérica.</span><span data-l="en">Open a category and compare the TOTAL price (with shipping and taxes to your country) before paying.</span></p>
+  <div class="bf-cats" data-bf-cats></div>
+  <div class="bf-row" data-bf-hubs></div>
+  <p class="bf-note" data-bf-note></p>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <h2><span data-l="es">✈️ Vuelos en promoción</span><span data-l="en">✈️ Flight deals</span></h2>
+  <p class="muted"><span data-l="es">Las aerolíneas también tienen Black Friday. Compara cientos de aerolíneas y agencias a la vez, y suma la maleta antes de decidir.</span><span data-l="en">Airlines have Black Friday too. Compare hundreds of airlines and agencies at once, and add the bag before deciding.</span></p>
+  <div class="bf-row" data-bf-fly></div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <h2><span data-l="es">🔎 ¿Ese descuento es real? Revísalo en 5 segundos</span><span data-l="en">🔎 Is that deal real? Check it in 5 seconds</span></h2>
+  <div class="vtools" id="vtools" data-only="descuento,comparar"></div>
+  <ol class="bf-tips">
+    <li><span data-l="es"><b>Mira el historial de precio.</b> Si "antes" costaba lo mismo que hoy, no hay descuento. Vigía te lo muestra solo.</span><span data-l="en"><b>Check the price history.</b> If the "was" price equals today's, there's no discount. Vigía shows it automatically.</span></li>
+    <li><span data-l="es"><b>Compara el precio TOTAL,</b> con envío, impuestos y cuotas. Lo barato puede salir caro.</span><span data-l="en"><b>Compare the TOTAL price,</b> with shipping, taxes and installments.</span></li>
+    <li><span data-l="es"><b>Busca el mismo modelo en otra tienda.</b> El mismo producto puede estar más barato al lado.</span><span data-l="en"><b>Look for the same model in another store.</b> It can be cheaper next door.</span></li>
+    <li><span data-l="es"><b>Desconfía del "solo por hoy" y los contadores.</b> Son para que compres sin pensar.</span><span data-l="en"><b>Be wary of "today only" and countdowns.</b> They're there so you buy without thinking.</span></li>
+    <li><span data-l="es"><b>Revisa que la tienda sea confiable:</b> contacto, devoluciones claras y opiniones reales.</span><span data-l="en"><b>Make sure the store is trustworthy:</b> contact info, clear returns and real reviews.</span></li>
+  </ol>
+</div></section>
+</main>
+
+<footer><div class="wrap"><div>© 2026 Vigía · Colombia · <a href="mailto:soporte@vigiacompras.com" class="mail">soporte@vigiacompras.com</a></div>
+<nav><a href="terminos.html"><span data-l="es">Términos</span><span data-l="en">Terms</span></a><a href="privacidad.html"><span data-l="es">Privacidad</span><span data-l="en">Privacy</span></a><a href="anunciate.html"><span data-l="es">Anúnciate · Tiendas aliadas</span><span data-l="en">Advertise · Partner stores</span></a></nav></div></footer>
+<script src="ajustes.js"></script>
+<script src="vigia-tiendas.js"></script>
+<script src="vigia-viajes.js"></script>
+<script src="sitio.js"></script>
+<script src="blackfriday.js"></script>
+<script src="herramientas.js"></script>
+</body>
+</html>
