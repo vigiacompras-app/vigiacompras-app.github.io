@@ -29,7 +29,28 @@
   if (countries.length && !countries.includes(country) && !['US'].includes(country)) country = countries.includes('US') ? 'US' : countries[0];
   const cname = c => { try { return new Intl.DisplayNames([lang()], { type: 'region' }).of(c); } catch (e) { return c; } };
   const day = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
-  const go = list => list.map(l => `<a class="tl" href="${esc(l.url)}" target="_blank" rel="noopener nofollow">${esc(l.name)} <span>↗</span></a>`).join('');
+  // ---------- 1.0.2: tiendas aliadas (afiliados). Nunca cambian el orden: solo agregan el código al enlace y se avisa. ----------
+  const AF = S.afiliados || {};
+  const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) { return ''; } };
+  const fits = (h, d) => { d = String(d || '').replace(/^www\./, '').toLowerCase(); return !!d && (h === d || h.endsWith('.' + d)); };
+  function affUrl(url) {
+    const h = hostOf(url);
+    if (!h) return { url, aff: false };
+    try {
+      const amz = Object.entries(AF.amazon || {}).find(([d, tag]) => tag && h === String(d).replace(/^www\./, '').toLowerCase());
+      if (amz) { const u = new URL(url); u.searchParams.set('tag', String(amz[1]).trim()); return { url: u.href, aff: true }; }
+      const w = (AF.tiendas || []).find(x => Array.isArray(x) && x[1] && /^https:\/\//.test(x[1]) && x[1].includes('{url}') && fits(h, x[0]));
+      if (w) return { url: w[1].split('{url}').join(encodeURIComponent(url)), aff: true };
+    } catch (e) {}
+    return { url, aff: false };
+  }
+  const avMarker = () => { const m = String(AF.aviasales || '').replace(/[^\w]/g, ''); return m ? m + '.web' : ''; };
+  const go = list => {
+    const rows = list.map(l => Object.assign({}, l, l.aff ? {} : affUrl(l.url)));
+    const links = rows.map(l => `<a class="tl${l.aff ? ' aff' : ''}" href="${esc(l.url)}" target="_blank" rel="noopener ${l.aff ? 'sponsored' : 'nofollow'}">${esc(l.name)}${l.aff ? ` <i title="${esc(T('Tienda aliada', 'Partner store'))}">🤝</i>` : ''} <span>↗</span></a>`).join('');
+    const amz = rows.some(r => r.aff && /(^|\.)amazon\./.test(hostOf(r.url)));
+    return `<div class="tlinks">${links}</div>` + (rows.some(r => r.aff) ? `<p class="hint aff-note">🤝 ${L('Tienda aliada: si compras ahí, Vigía puede recibir una pequeña comisión, sin costo extra para ti. Nunca cambia el orden ni los precios que te mostramos.', 'Partner store: if you buy there, Vigía may earn a small commission at no extra cost to you. It never changes the order or the prices we show you.')}${amz ? ' ' + L('Como Afiliado de Amazon, Vigía obtiene ingresos por las compras adscritas que cumplen los requisitos aplicables.', 'As an Amazon Associate, Vigía earns from qualifying purchases.') : ''}</p>` : '');
+  };
 
   // ---------- Pestañas ----------
   const TABS = [
@@ -94,18 +115,18 @@
       if (!q || !ST) return;
       const list = ST.storesFor(country).map(s => ({ name: s.name, url: ST.searchUrl(s, q) })).filter(x => x.url);
       list.push({ name: 'Google Shopping', url: ST.googleShoppingUrl ? ST.googleShoppingUrl(q, country) : 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(q) });
-      out(k).innerHTML = `<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p><div class="tlinks">${go(list)}</div>`;
+      out(k).innerHTML = `<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p>${go(list)}`;
     }
     if (k === 'vuelos' && TV) {
       const iata = x => /^[a-z]{3}$/i.test(x) ? x.toUpperCase() : null;
       const a = v('from'), b = v('to');
       const trip = { kind: 'flight', site: 'vigia', from: iata(a), to: iata(b), fromName: iata(a) ? null : a, toName: iata(b) ? null : b, out: v('out') || null, back: v('back') || null, adults: +v('pax') || 1 };
-      out(k).innerHTML = `<p class="hint">${L('Abre 2 o 3 y compara. Ojo con la maleta: usa "Precio real del vuelo".', 'Open 2 or 3 and compare. Watch the bag fees: use "Real flight price".')}</p><div class="tlinks">${go(TV.flightLinks(trip, country))}</div>${!trip.from || !trip.to ? `<p class="hint">${L('Tip: con el código del aeropuerto (BOG, MIA, MAD) las páginas abren con tu búsqueda lista.', 'Tip: with the airport code (BOG, MIA, MAD) the sites open with your search ready.')}</p>` : ''}`;
+      out(k).innerHTML = `<p class="hint">${L('Abre 2 o 3 y compara. Ojo con la maleta: usa "Precio real del vuelo".', 'Open 2 or 3 and compare. Watch the bag fees: use "Real flight price".')}</p>${go((avMarker() && TV.aviasalesUrl ? [{ name: 'Aviasales', url: TV.aviasalesUrl(trip, avMarker()), aff: true }] : []).concat(TV.flightLinks(trip, country)))}${!trip.from || !trip.to ? `<p class="hint">${L('Tip: con el código del aeropuerto (BOG, MIA, MAD) las páginas abren con tu búsqueda lista.', 'Tip: with the airport code (BOG, MIA, MAD) the sites open with your search ready.')}</p>` : ''}`;
     }
     if (k === 'hoteles' && TV) {
       const ci = v('in'), co = v('outd');
       const trip = { kind: 'stay', site: 'vigia', dest: v('dest'), checkin: ci || null, checkout: co || null, nights: ci && co ? Math.max(1, Math.round((Date.parse(co) - Date.parse(ci)) / 86400000)) : null, adults: +v('pax') || 2 };
-      out(k).innerHTML = `<p class="hint">${L('Compara el precio TOTAL con impuestos y tarifas, no solo el de la noche.', 'Compare the TOTAL price with taxes and fees, not just the nightly rate.')}</p><div class="tlinks">${go(TV.links(trip, country))}</div>`;
+      out(k).innerHTML = `<p class="hint">${L('Compara el precio TOTAL con impuestos y tarifas, no solo el de la noche.', 'Compare the TOTAL price with taxes and fees, not just the nightly rate.')}</p>${go(TV.links(trip, country))}`;
     }
     if (k === 'real') {
       const pax = Math.max(1, +v('pax') || 1), both = f.elements.both && f.elements.both.checked ? 2 : 1;
@@ -144,13 +165,27 @@
     const f0 = box.querySelector('[data-f="comparar"]');
     if (q0 && f0 && !box.dataset.qDone) { box.dataset.qDone = '1'; f0.elements.q.value = q0.slice(0, 200); f0.requestSubmit ? f0.requestSubmit() : f0.dispatchEvent(new Event('submit', { cancelable: true })); }
   } catch (e) {}
+  // 1.0.2: llega desde el bot con un vuelo (app.html?vuelo=BOG-MIA-2026-12-15): abre la pestaña de vuelos con la búsqueda lista
+  try {
+    const v0 = new URLSearchParams(location.search).get('vuelo');
+    const tabV = box.querySelector('[data-tab="vuelos"]'), fv = box.querySelector('[data-f="vuelos"]');
+    if (v0 && tabV && fv && !box.dataset.vDone) {
+      box.dataset.vDone = '1'; tabV.click();
+      const m = /^([A-Za-z]{3})-([A-Za-z]{3})(?:-(\d{4}-\d{2}-\d{2}))?$/.exec(v0.trim());
+      if (m) {
+        fv.elements.from.value = m[1].toUpperCase(); fv.elements.to.value = m[2].toUpperCase();
+        if (m[3]) { fv.elements.out.value = m[3]; fv.elements.back.value = ''; }
+        fv.requestSubmit ? fv.requestSubmit() : fv.dispatchEvent(new Event('submit', { cancelable: true }));
+      }
+    }
+  } catch (e) {}
   }
   init();
   // Vista previa del editor (editor.html): vuelve a dibujar las herramientas con lo que vas cambiando
   window.addEventListener('message', ev => {
     if (ev.source !== window.parent || (ev.origin !== location.origin && location.protocol !== 'file:') || !ev.data || ev.data.type !== 'vigia-preview') return;
     const st = ev.data.settings || {};
-    window.VIGIA_SITE = Object.assign({}, window.VIGIA_SITE, { herramientas: st.herramientas || {}, apps: st.apps || {} });
+    window.VIGIA_SITE = Object.assign({}, window.VIGIA_SITE, { herramientas: st.herramientas || {}, apps: st.apps || {}, afiliados: st.afiliados || {} });
     const old = document.getElementById('vtools');
     if (old) { const n = old.cloneNode(false); old.replaceWith(n); setTimeout(init, 0); }
   });

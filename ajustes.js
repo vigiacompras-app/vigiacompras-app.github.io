@@ -101,6 +101,16 @@ window.VIGIA_SITE = {
   // Herramientas de Vigía en la web (sección "Úsalo ya" y la app del celular app.html). true = se muestra
   herramientas: { comparar: true, vuelos: true, hoteles: true, precioReal: true, descuento: true, app: true },
 
+  // Tiendas aliadas (afiliados) de la web y la app del celular. Vacío = el enlace va limpio.
+  // Se marca con 🤝 y un aviso; nunca cambia el orden ni los precios.
+  afiliados: {
+    aviasales: '811762',                         // Travelpayouts: tu ID (marker). Vuelos de Aviasales
+    amazon: { 'amazon.com': 'vigiacompras-20' }, // Amazon Associates: dominio → tu ID (ej. 'vigiacompras-20')
+    tiendas: []                                  // Admitad, Awin, Impact…: ['falabella.com.co', 'https://ad.admitad.com/g/XXXX/?ulp={url}']
+  },
+  // Otras tiendas aliadas que quieras mostrar en anunciate.html (las que tienen código ya salen solas). Ej.: ['Mercado Libre', 'AliExpress']
+  aliadas: [],
+
   // Vigía en el celular. Si un enlace está vacío, el botón dice "Muy pronto".
   apps: {
     telegram: 'https://t.me/VigiaComprasBot',   // bot de alertas

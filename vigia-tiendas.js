@@ -120,13 +120,19 @@
   }
 
   const COLORS = /^(negro|negra|blanco|blanca|azul|rojo|roja|verde|gris|plata|plateado|dorado|rosado|rosa|morado|amarillo|black|white|blue|red|green|gray|grey|silver|gold|pink|purple|yellow|preto|branco|cinza|azul|vermelho|graphite|grafito|midnight|starlight)$/i;
-  const FILLER = new Set(['de', 'la', 'el', 'los', 'las', 'en', 'con', 'para', 'por', 'y', 'e', 'o', 'the', 'and', 'with', 'for', 'of', 'new', 'nuevo', 'nueva', 'original', 'originales', 'envio', 'envío', 'gratis', 'free', 'shipping', 'oferta', 'sale', 'promo', 'color', 'unidad', 'un', 'una', 'a', 'do', 'da', 'com', 'para', 'sem']);
+  const FILLER = new Set(['de', 'la', 'el', 'los', 'las', 'en', 'con', 'para', 'por', 'y', 'e', 'o', 'the', 'and', 'with', 'for', 'of', 'new', 'nuevo', 'nueva', 'original', 'originales', 'envio', 'envío', 'gratis', 'free', 'shipping', 'oferta', 'sale', 'promo', 'color', 'unidad', 'un', 'una', 'a', 'do', 'da', 'com', 'para', 'sem',
+    // 1.0.1: palabras de venta que ensucian la búsqueda ("SUPER OFERTA… envío gratis!!")
+    'super', 'súper', 'mega', 'hot', 'promocion', 'promoción', 'promo', 'descuento', 'ofertas', 'liquidacion', 'liquidación', 'remate', 'barato', 'baratos', 'precio', 'solo', 'hoy', 'ya', 'disponible', 'disponibles', 'stock', 'entrega', 'inmediata', 'envios', 'envíos', 'domicilio', 'nacional', 'garantia', 'garantía', 'deal', 'deals', 'best', 'seller', 'top', 'venta', 'vendo', 'nuevos', 'nuevas', 'originals']);
 
   /** Convierte el nombre del producto en una búsqueda corta y precisa. */
   // Códigos de modelo ("9557", "BABNT9557", "SM-A155M"): las tiendas casi nunca los encuentran en una búsqueda
   const CODE = w => /\d/.test(w) && (/^[\d.,]+$/.test(w) || /[a-z]/i.test(w)) && w.length >= 4 && !/^\d+(gb|tb|mb|mah|w|v|hz|mm|cm|ml|l|kg|g|"|pulgadas)$/i.test(w);
   function words(product) {
     const ws = String(product.name || '')
+      // 1.0.1: fuera emojis, #etiquetas, @cuentas, precios, porcentajes, "2x1" y signos de exclamación
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, ' ')
+      .replace(/[#@][\p{L}\d_]+/gu, ' ')
+      .replace(/(?:US\$|R\$|S\/|[$€£¥₹])\s?\d[\d.,]*|\b\d{1,3}\s?%|\b\d\s?x\s?\d\b|[!¡?¿*~]+/gi, ' ')
       .replace(/[|,;:()\[\]{}"“”/\\+]+/g, ' ')
       .split(/\s+/)
       .filter(w => w && !FILLER.has(w.toLowerCase()) && !COLORS.test(w) && !/^-+$/.test(w));

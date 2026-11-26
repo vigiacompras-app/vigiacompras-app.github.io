@@ -41,6 +41,10 @@
     PR = normPrices(S.precios); LK = { ...((S.compra || {}).enlaces || {}) }; showRegion();
     $('compra_on').checked = !S.compra || S.compra.activo !== false;
     const rg = S.regiones || {}; $('reg_alto').value = (rg.alto || []).join(', '); $('reg_bajo').value = (rg.bajo || []).join(', ');
+    const af = S.afiliados || {}; $('af_aviasales').value = af.aviasales || '';
+    $('af_amazon').value = Object.entries(af.amazon || {}).map(([d, t]) => d + ' | ' + (t || '')).join('\n');
+    $('af_tiendas').value = (af.tiendas || []).map(x => x[0] + ' | ' + x[1]).join('\n');
+    $('af_aliadas').value = (S.aliadas || []).join('\n');
     const ap = S.apps || {}; ['telegram', 'android', 'ios'].forEach(k => { $('a_' + k).value = ap[k] || ''; });
     document.querySelectorAll('[data-tool]').forEach(i => { i.checked = (S.herramientas || {})[i.dataset.tool] !== false; });
     ['obrasBeneficasPct', 'tiendaChrome', 'sitio', 'correo', 'blackFriday'].forEach(k => { $(k).value = S[k] ?? ''; });
@@ -55,6 +59,10 @@
     keepRegion(); S.precios = JSON.parse(JSON.stringify(PR));
     S.compra = { activo: $('compra_on').checked, enlaces: { ...LK } };
     S.regiones = { alto: list($('reg_alto').value), bajo: list($('reg_bajo').value) };
+    const pairs = v => v.split('\n').map(l => l.split('|').map(x => x.trim())).filter(x => x[0] && x.length > 1);
+    S.afiliados = { aviasales: $('af_aviasales').value.replace(/[^\w]/g, ''), amazon: {}, tiendas: pairs($('af_tiendas').value).filter(x => /^https:\/\//.test(x[1]) && x[1].includes('{url}')).map(x => [x[0].replace(/^https?:\/\//, '').replace(/\/.*$/, ''), x[1]]) };
+    pairs($('af_amazon').value).forEach(([d, t]) => { const dom = d.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, ''); if (/^amazon\.[a-z.]+$/.test(dom)) S.afiliados.amazon[dom] = t.replace(/[^\w-]/g, ''); });
+    S.aliadas = $('af_aliadas').value.split('\n').map(x => x.trim()).filter(Boolean).slice(0, 40);
     S.apps = {}; ['telegram', 'android', 'ios'].forEach(k => { S.apps[k] = $('a_' + k).value.trim(); });
     S.herramientas = {}; document.querySelectorAll('[data-tool]').forEach(i => { S.herramientas[i.dataset.tool] = i.checked; });
     S.obrasBeneficasPct = Math.max(0, Math.min(100, +$('obrasBeneficasPct').value || 0));
@@ -105,6 +113,8 @@ ${lk}
     }
   },
   herramientas: { ${Object.entries(S.herramientas).map(([k, v]) => k + ': ' + v).join(', ')} },
+  afiliados: { aviasales: ${J(S.afiliados.aviasales)}, amazon: ${J(S.afiliados.amazon)}, tiendas: ${J(S.afiliados.tiendas)} },
+  aliadas: ${J(S.aliadas)},
   apps: { telegram: ${J(S.apps.telegram)}, android: ${J(S.apps.android)}, ios: ${J(S.apps.ios)} },
   obrasBeneficasPct: ${S.obrasBeneficasPct},
   tiendaChrome: ${J(S.tiendaChrome)},

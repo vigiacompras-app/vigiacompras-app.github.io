@@ -328,6 +328,79 @@
     return list.concat(regional(country, 'f', f, extra)).filter(x => x.id !== f.site && !(x.regional && x.name === f.siteName));
   }
 
+  // ---------- 1.0.2: la lista de alojamientos de la página (tipo Rift): nombre, calificación y precio ----------
+  const RATE_RE = [
+    /\b(10|[1-9](?:[.,]\d)?)\s*(?:\/\s*10|de 10|out of 10)\b/i,
+    /(?:Puntuación|Puntaje|Scored|Nota|Avaliação)[^\d]{0,12}(10|[1-9][.,]\d)\b/i,
+    /\b(10|[1-9][.,]\d)\s*(?:\n|\s)*(?:Excepcional|Exceptional|Fantástico|Fantastic|Fabuloso|Fabulous|Increíble|Wonderful|Magnífico|Superb|Excelente|Excellent|Muy bien|Very good|Bien|Good|Bueno|Muito bom|Excelente|Ótimo|Maravilhoso)\b/i
+  ];
+  const STAR_RE = /(?:★|⭐|\bRating\b|\bCalificación\b)\s*([1-5][.,]\d{1,2})\b|\b([1-5][.,]\d{1,2})\s*(?:★|⭐|\(\d[\d.,]*\))/;
+  function parseStayCard(el) {
+    const text = String(el.innerText || el.textContent || '').replace(/ /g, ' ');
+    const re = new RegExp(PRICE_RE.source, 'g'); let m, last = null;
+    while ((m = re.exec(text))) last = m;
+    if (!last) return null;
+    const price = num(last[1] || last[2]); if (!price) return null;
+    let rating = null;
+    for (const r of RATE_RE) { const x = r.exec(text); if (x) { rating = parseFloat(x[1].replace(',', '.')); break; } }
+    if (rating == null) { const x = STAR_RE.exec(text); if (x) rating = Math.round(parseFloat((x[1] || x[2]).replace(',', '.')) * 2 * 10) / 10; }
+    if (rating == null || rating > 10) return null;
+    const h = el.querySelector && el.querySelector('h2, h3, h4, [data-testid="title"], [itemprop="name"]');
+    let name = h ? String(h.innerText || h.textContent || '').trim() : '';
+    if (!name) name = text.split('\n').map(x => x.trim()).find(x => x.length >= 4 && x.length <= 90 && !/\d{2,}|^(nuevo|new|oferta|deal|patrocinado|sponsored|ad)\b/i.test(x)) || '';
+    name = name.replace(/\s+/g, ' ').slice(0, 80);
+    if (!name) return null;
+    return { name, rating, price };
+  }
+  /** Los alojamientos que muestra la página (hasta 30): el elemento más pequeño con precio, calificación y nombre. */
+  function stayOptions(doc) {
+    if (!doc || !doc.body) return [];
+    const nodes = doc.body.querySelectorAll('li, article, div, a, section');
+    const cand = [];
+    for (let i = 0; i < nodes.length && i < 9000 && cand.length < 500; i++) {
+      const el = nodes[i]; const tx = el.innerText || '';
+      if (tx.length < 20 || tx.length > 1500 || !PRICE_RE.test(tx)) continue;
+      if (!RATE_RE.some(r => r.test(tx)) && !STAR_RE.test(tx)) continue;
+      cand.push(el);
+    }
+    const cards = cand.filter(c => !cand.some(d => d !== c && c.contains(d)));
+    const out = [], seen = new Set();
+    for (const c of cards) {
+      if (out.length >= 30) break;
+      let o = parseStayCard(c);
+      // Si el nombre quedó afuera de la tarjeta mínima, mira un nivel arriba
+      if (!o && c.parentElement && (c.parentElement.innerText || '').length < 1800) o = parseStayCard(c.parentElement);
+      if (!o) continue;
+      const k = o.name.toLowerCase() + '|' + o.price;
+      if (seen.has(k)) continue; seen.add(k); out.push(o);
+    }
+    return out.length >= 2 ? out : [];
+  }
+  /** Mejor relación calidad-precio, más barato y mejor calificado. */
+  function rankStays(list) {
+    const L = (list || []).filter(o => o && o.price > 0 && o.rating > 0);
+    if (!L.length) return [];
+    const minP = Math.min(...L.map(o => o.price));
+    const scored = L.map(o => Object.assign({}, o, { score: o.price / minP + (10 - Math.min(10, o.rating)) * 0.2 + (o.rating < 7 ? 0.4 : 0) }));
+    scored.sort((a, b) => a.score - b.score);
+    const cheap = scored.reduce((a, b) => b.price < a.price ? b : a);
+    const top = scored.reduce((a, b) => b.rating > a.rating || (b.rating === a.rating && b.price < a.price) ? b : a);
+    return scored.map((o, i) => Object.assign(o, { best: i === 0, cheapest: o === cheap, top: o === top }));
+  }
+
+  /** 1.0.2: enlace de Aviasales (Travelpayouts). marker = código de afiliado (con subID: "811762.web"). Sin marker, enlace limpio. */
+  function aviasalesUrl(f, marker) {
+    const ddmm = d => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || '')); return m ? m[3] + m[2] : ''; };
+    const code = x => /^[A-Z]{3}$/.test(String(x || '')) ? x : null;
+    let url = 'https://www.aviasales.com/';
+    if (f && code(f.from) && code(f.to) && ddmm(f.out)) {
+      const a = Math.max(1, Math.min(9, +f.adults || 1));
+      url = `https://www.aviasales.com/search/${f.from}${ddmm(f.out)}${f.to}${f.back ? ddmm(f.back) : ''}${a}`;
+    }
+    const mk = String(marker || '').replace(/[^\w.-]/g, '');
+    return mk ? url + '?marker=' + mk : url;
+  }
+
   // ---------- 1.0: qué incluye el vuelo (equipaje) y el precio más bajo que se ve ----------
   const num = raw => {
     raw = String(raw).replace(/[^\d.,]/g, '');
@@ -449,7 +522,7 @@
     return scored.map((o, i) => Object.assign(o, { best: i === 0, cheapest: o === cheap, fastest: o === fast }));
   }
 
-  const api = { REGIONAL, regional, fill, SITES, FLY, siteOf, flySiteOf, detect, detectFlight, flightLinks, totalFromText, perNight, links, fareInfo, flightPriceFromText, LOWCOST, flightOptions, parseFlightCard, rankFlights };
+  const api = { REGIONAL, regional, fill, SITES, FLY, siteOf, flySiteOf, detect, detectFlight, flightLinks, aviasalesUrl, totalFromText, perNight, links, fareInfo, flightPriceFromText, LOWCOST, flightOptions, parseFlightCard, rankFlights, stayOptions, parseStayCard, rankStays };
   root.VigiaTravel = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

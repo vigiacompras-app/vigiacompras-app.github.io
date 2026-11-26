@@ -260,7 +260,7 @@ html[data-lang="es"] [data-l="es"], html[data-lang="en"] [data-l="en"] { display
 .textra { margin-top: 16px; align-items: center; }
 .vtools [hidden] { display: none !important; }
 .tl { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); color: var(--ink); text-decoration: none; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer; }
-.tl span { color: var(--brand); } .tl:hover { border-color: var(--brand); color: var(--brand); }
+.tl span { color: var(--brand); } .tl i { font-style: normal; } .aff-note { font-size: 12.5px; margin-top: 8px; } .tl:hover { border-color: var(--brand); color: var(--brand); }
 .tl.tg { background: color-mix(in srgb, #229ED9 12%, var(--card)); border-color: color-mix(in srgb, #229ED9 40%, var(--line)); }
 .vtools .hint, .apphero .hint { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
 .rrows { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
