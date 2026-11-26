@@ -108,6 +108,10 @@ window.VIGIA_SITE = {
     amazon: { 'amazon.com': 'vigiacompras-20' }, // Amazon Associates: dominio → tu ID (ej. 'vigiacompras-20')
     tiendas: []                                  // Admitad, Awin, Impact…: ['falabella.com.co', 'https://ad.admitad.com/g/XXXX/?ulp={url}']
   },
+  // Black Friday (blackfriday.html): categorías de Amazon → [ícono, nombre en español, nombre en inglés, búsqueda en Amazon]. Vacío = las de siempre.
+  ofertasBF: [],
+  // Canal de ofertas en Telegram (https://t.me/…). Vacío = el bot de Vigía.
+  canalOfertas: '',
   // Otras tiendas aliadas que quieras mostrar en anunciate.html (las que tienen código ya salen solas). Ej.: ['Mercado Libre', 'AliExpress']
   aliadas: [],
 
