@@ -80,7 +80,7 @@
   const tg = (S.apps || {}).telegram;
   box.innerHTML = `<div class="ttabs" role="tablist">${TABS.map(([k, ic, lb], i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-tab="${k}">${ic} ${lb}</button>`).join('')}</div>
     ${TABS.map(([k], i) => `<div class="tpane" data-pane="${k}" ${i ? 'hidden' : ''}>${PANES[k]}</div>`).join('')}
-    <div class="textra">${tg ? `<a class="tl tg" href="${esc(tg)}" target="_blank" rel="noopener">🔔 ${L('Recibe alertas de precio en Telegram', 'Get price alerts on Telegram')}</a>` : ''}${H.app ? `<button type="button" class="tl" data-install hidden>📱 ${L('Instalar Vigía en este celular', 'Install Vigía on this phone')}</button><span class="hint" data-ios hidden>📱 ${L('En iPhone: toca Compartir ⬆️ y luego "Agregar a inicio".', 'On iPhone: tap Share ⬆️ then "Add to Home Screen".')}</span>` : ''}</div>
+    <div class="textra"><button type="button" class="tl" data-myal>🔔 ${L('Mis alertas', 'My alerts')}</button>${tg ? `<a class="tl tg" href="${esc(tg)}" target="_blank" rel="noopener">🔔 ${L('Recibe alertas de precio en Telegram', 'Get price alerts on Telegram')}</a>` : ''}${H.app ? `<button type="button" class="tl" data-install hidden>📱 ${L('Instalar Vigía en este celular', 'Install Vigía on this phone')}</button><span class="hint" data-ios hidden>📱 ${L('En iPhone: toca Compartir ⬆️ y luego "Agregar a inicio".', 'On iPhone: tap Share ⬆️ then "Add to Home Screen".')}</span>` : ''}</div><div class="myal-box" data-myal-box hidden></div>
     <p class="hint">${L('Desde la web, Vigía abre las búsquedas por ti. Para que lea los precios solo y te avise de descuentos falsos, usa la extensión en Chrome.', 'From the web, Vigía opens the searches for you. To read prices automatically and flag fake discounts, use the Chrome extension.')}</p>`;
 
   box.addEventListener('click', e => {
@@ -142,7 +142,7 @@
       cells += `<a class="cal-d${x.p === min ? ' best' : ''}" href="${esc(url)}" target="_blank" rel="noopener ${avMarker() ? 'sponsored' : 'nofollow'}" title="${esc(iso + (x.t === 0 ? ' · ' + T('directo', 'nonstop') : ' · ' + x.t + ' ' + T('escala(s)', 'stop(s)')))}"><i>${d}</i><b>${esc('$' + Math.round(x.p))}</b></a>`;
     }
     slot.innerHTML = `<div class="cal"><div class="cal-top"><button type="button" class="tl" data-cal-go="${prev}" ${prev < thisMonth ? 'disabled' : ''}>‹</button><b>${esc(title)} · ${esc(trip.from)} → ${esc(trip.to)}</b><button type="button" class="tl" data-cal-go="${next}">›</button></div>
-      ${prices.length ? `<div class="cal-g">${wd}${cells}</div><p class="hint">✈️ ${L(`Día más barato desde <b>${usd(min)}</b> por persona, solo ida. Toca un día para verlo en Aviasales 🤝. Precios que vieron otros viajeros en los últimos días; pueden cambiar.`, `Cheapest day from <b>${usd(min)}</b> per person, one way. Tap a day to see it on Aviasales 🤝. Prices other travelers saw recently; they may change.`)}</p>`
+      ${prices.length ? `<div class="cal-g">${wd}${cells}</div><p class="hint">✈️ ${L(`Día más barato desde <b>${usd(min)}</b> por persona, solo ida. Toca un día para verlo en Aviasales 🤝. Precios que vieron otros viajeros en los últimos días; pueden cambiar.`, `Cheapest day from <b>${usd(min)}</b> per person, one way. Tap a day to see it on Aviasales 🤝. Prices other travelers saw recently; they may change.`)}</p>${alertBox({ kind: 'flight', from: trip.from, to: trip.to, month, out: (trip.out || '').startsWith(month) ? trip.out : null }, Math.max(1, Math.floor(min * 0.95)), 'USD')}`
         : `<p class="hint">${L('Aún no hay precios guardados para esta ruta en este mes. Prueba el mes siguiente o usa los enlaces de arriba.', 'No saved prices for this route this month yet. Try next month or use the links above.')}</p>`}</div>`;
     slot.dataset.trip = JSON.stringify(trip);
   }
@@ -164,6 +164,59 @@
     if (r.q.length < 3 || shop.test(r.q)) return null;
     return r;
   }
+  // ---------- Alertas de precio desde la web (sin cuenta): se crean aquí y avisan por Telegram ----------
+  const money = (v, cur) => { try { return new Intl.NumberFormat(lang() === 'en' ? 'en-US' : 'es-CO', { style: 'currency', currency: cur || 'USD', maximumFractionDigits: 0 }).format(v); } catch (e) { return String(Math.round(v)) + (cur ? ' ' + cur : ''); } };
+  const BOT = /t\.me\/\w+bot\/?$/i.test(String(tg || '')) ? String(tg).replace(/\/$/, '') : 'https://t.me/VigiaComprasBot';
+  const alertBox = (data, def, cur) => `<form class="alrt" data-alert="${esc(JSON.stringify(data))}"><label>🔔 ${L('Avísame si baja de', 'Alert me if it drops below')} <input name="target" type="number" min="1" step="any" inputmode="decimal" value="${esc(String(def))}"> ${esc(cur || '')}</label><button class="btn sm" type="submit">${L('Crear alerta', 'Create alert')}</button><div class="alrt-msg" data-alert-msg></div></form>`;
+  async function tgConnect(el) {
+    if (!el) return;
+    const r = await srv('tg_start', {});
+    if (!el.isConnected) return;
+    if (!r || !r.token) { el.innerHTML = `<p class="hint">${L('No pude conectar Telegram ahora. Intenta en un momento desde «Mis alertas».', 'Could not connect Telegram now. Try again soon from «My alerts».')}</p>`; return; }
+    el.innerHTML = `<p class="hint">📲 ${L('Último paso: conecta Telegram para recibir el aviso. Sin cuenta ni contraseña.', 'Last step: connect Telegram to get the alert. No account or password.')}</p><a class="btn sm" href="${esc(BOT + '?start=' + r.token)}" target="_blank" rel="noopener">✈️ ${L('Abrir Telegram y tocar «Iniciar»', 'Open Telegram and tap «Start»')}</a><p class="hint" data-tgwait>⏳ ${L('Esperando que toques «Iniciar» en Telegram…', 'Waiting for you to tap «Start» in Telegram…')}</p>`;
+    for (let i = 0; i < 60; i++) {
+      await new Promise(res => setTimeout(res, 3000));
+      if (!el.isConnected) return;
+      const st = await srv('status', {});
+      if (st && st.tg) { el.innerHTML = `<p class="hint">✅ ${L('¡Telegram conectado! Ahí te llegarán los avisos.', 'Telegram connected! Your alerts will arrive there.')}</p>`; return; }
+    }
+    const w = el.querySelector('[data-tgwait]'); if (w) w.innerHTML = L('Si ya tocaste «Iniciar», revisa en «Mis alertas» que diga conectado.', 'If you already tapped «Start», check «My alerts» says connected.');
+  }
+  async function myAlerts() {
+    const bx = box.querySelector('[data-myal-box]'); if (!bx) return;
+    bx.hidden = false; bx.innerHTML = `<p class="hint">⏳ ${L('Cargando tus alertas…', 'Loading your alerts…')}</p>`;
+    const r = await srv('alert_list', {});
+    if (!r || !r.ok) { bx.innerHTML = `<p class="hint">${L('No pude cargar tus alertas. Intenta de nuevo.', 'Could not load your alerts. Try again.')}</p>`; return; }
+    const items = (r.alerts || []).map(a => `<li><span>${a.kind === 'flight' ? '✈️' : '📦'} <b>${esc(a.name || '')}</b><small>${a.kind === 'flight' ? esc(a.out_day || a.month) + ' · ' : ''}${L('avísame si baja de', 'alert below')} ${esc(money(Number(a.target), a.currency))}${a.last_price ? ' · ' + L('último precio', 'last price') + ' ' + esc(money(Number(a.last_price), a.currency)) : ''}</small></span><button type="button" class="tl" data-al-del="${esc(String(a.id))}">${L('Quitar', 'Remove')}</button></li>`);
+    bx.innerHTML = (items.length ? `<ul class="myal">${items.join('')}</ul>` : `<p class="hint">${L('Aún no tienes alertas. Créalas desde el calendario de vuelos o pegando el enlace de un producto en «Comparar».', 'No alerts yet. Create them from the flight calendar or by pasting a product link in «Compare».')}</p>`)
+      + (r.tg ? `<p class="hint">✅ ${L('Telegram conectado: ahí te llegan los avisos. Vigía revisa los precios cada 3 horas.', 'Telegram connected: your alerts arrive there. Vigía checks prices every 3 hours.')}</p>` : (items.length ? '<div data-tgc></div>' : ''));
+    if (!r.tg && items.length) tgConnect(bx.querySelector('[data-tgc]'));
+  }
+  box.addEventListener('click', async e => {
+    if (e.target.closest('[data-myal]')) { const bx = box.querySelector('[data-myal-box]'); if (bx && !bx.hidden) { bx.hidden = true; return; } myAlerts(); return; }
+    const del = e.target.closest('[data-al-del]');
+    if (del) { del.disabled = true; await srv('alert_del', { id: Number(del.dataset.alDel) }); myAlerts(); }
+  });
+  box.addEventListener('submit', async e => {
+    const f = e.target; if (!f.matches || !f.matches('.alrt')) return;
+    const msg = f.querySelector('[data-alert-msg]'), btn = f.querySelector('button');
+    let d; try { d = JSON.parse(f.dataset.alert); } catch (er) { return; }
+    const target = Number(String(f.elements.target.value || '').replace(',', '.'));
+    if (!(target > 0)) { msg.innerHTML = `<p class="hint">${L('Escribe el precio al que quieres que te avise.', 'Type the price you want to be alerted at.')}</p>`; return; }
+    btn.disabled = true; msg.innerHTML = `<p class="hint">⏳ ${L('Creando tu alerta…', 'Creating your alert…')}</p>`;
+    const r = await srv('alert_add', Object.assign({}, d, { target }));
+    btn.disabled = false;
+    if (!r || !r.ok) {
+      const why = r && r.error === 'max' ? L('Ya tienes 10 alertas activas. Quita alguna en «Mis alertas».', 'You already have 10 active alerts. Remove one in «My alerts».')
+        : r && r.error === 'noprice' ? L('No pude leer el precio de esa página. Prueba con el enlace de otra tienda.', 'Could not read the price on that page. Try a link from another store.')
+        : r && r.error === 'price' ? L('Aún no hay precios para esa ruta en ese mes.', 'No prices for that route that month yet.')
+        : L('No se pudo crear la alerta. Intenta de nuevo.', 'Could not create the alert. Try again.');
+      msg.innerHTML = `<p class="hint">${why}</p>`; return;
+    }
+    f.querySelector('label').hidden = true; btn.hidden = true;
+    msg.innerHTML = `<p class="hint">✅ ${L('Alerta creada: te aviso cuando baje de', 'Alert created: I will tell you when it drops below')} <b>${esc(money(Number(r.target), r.currency))}</b>.</p>` + (r.tg ? `<p class="hint">📲 ${L('Te llegará por Telegram. Mira o quita tus alertas en «Mis alertas».', 'It will arrive on Telegram. See or remove your alerts in «My alerts».')}</p>` : '<div data-tgc></div>');
+    if (!r.tg) tgConnect(msg.querySelector('[data-tgc]'));
+  });
   const fmt = n => (Math.round(n * 100) / 100).toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO');
   // ---------- Buscador de aeropuertos: escribes la ciudad y eliges de la lista (lista local, sin servicios externos) ----------
   const AP = (() => {
@@ -217,7 +270,8 @@
         const list = ST.storesFor(country).map(s => ({ name: s.name, url: ST.searchUrl(s, q) })).filter(x => x.url);
         list.push({ name: 'Google Shopping', url: ST.googleShoppingUrl ? ST.googleShoppingUrl(q, country) : 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(q) });
         const card = prod ? `<div class="pcard"><span>📦</span><div><b>${esc(prod.name)}</b>${prod.price ? `<small>${L('Precio en esa página', 'Price on that page')}: <b>${esc(prod.price.toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO'))}${prod.currency ? ' ' + esc(prod.currency) : ''}</b></small>` : ''}<small>${L('Compáralo abajo en otras tiendas de', 'Compare it below in other stores in')} ${esc(cname(country))} ${L('(mira el precio TOTAL con envío)', '(check the TOTAL price with shipping)')}</small></div></div>` : '';
-        out(k).innerHTML = `${card}<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p>${go(list)}`;
+        const al = prod && prod.price && /^(https?:\/\/|www\.)/i.test(raw) ? alertBox({ kind: 'product', url: raw }, Math.floor(prod.price * 0.95), prod.currency) : '';
+        out(k).innerHTML = `${card}${al}<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p>${go(list)}`;
       };
       if (!ST || !raw) return;
       if (/^(https?:\/\/|www\.)/i.test(raw)) { readLink(raw, k).then(r => { const q = r ? r.q : queryFrom(raw); if (q) show(q, r); else out(k).innerHTML = `<p class="hint">${L('No pude leer ese enlace. Escribe el nombre del producto.', 'I could not read that link. Type the product name.')}</p>`; }); return; }
