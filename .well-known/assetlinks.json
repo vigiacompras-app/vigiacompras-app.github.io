@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.vigiacompras.app",
+    "sha256_cert_fingerprints": ["C1:F2:79:E5:5E:DC:F8:09:4F:62:98:D4:54:D4:0F:6E:59:79:CF:6E:54:B5:9C:8F:14:00:C2:85:66:A2:18:49"]
+  }
+}]
