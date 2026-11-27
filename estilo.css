@@ -302,3 +302,15 @@ a.cal-d:hover { border-color: var(--brand); }
 .apl-list li b { color: var(--ink); font-size: 14.5px; } .apl-list li b span { color: var(--brand); font-size: 13px; margin-left: 4px; }
 .apl-list li small { color: var(--muted); font-weight: 500; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .apl-list li.on, .apl-list li:hover { background: var(--soft); }
+
+/* Alertas de precio desde la web (Telegram, sin cuenta) */
+.alrt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 12px 0 4px; padding: 10px 12px; border: 1.5px dashed var(--line); border-radius: 12px; background: var(--card); }
+.alrt label { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 600; font-size: 14px; color: var(--ink); }
+.alrt input { width: 120px; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; background: var(--card); color: var(--ink); }
+.alrt-msg { flex-basis: 100%; } .alrt-msg:empty { display: none; } .alrt-msg .hint { margin: 4px 0; }
+.btn.sm { padding: 8px 14px; font-size: 14px; }
+.myal-box { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.myal { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 8px; }
+.myal li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.myal li span { display: grid; gap: 2px; } .myal li small { color: var(--muted); }
+.myal li:last-child { border-bottom: 0; }
