@@ -275,6 +275,12 @@
     const f0 = box.querySelector('[data-f="comparar"]');
     if (q0 && f0 && !box.dataset.qDone) { box.dataset.qDone = '1'; f0.elements.q.value = q0.slice(0, 200); f0.requestSubmit ? f0.requestSubmit() : f0.dispatchEvent(new Event('submit', { cancelable: true })); }
   } catch (e) {}
+  // App instalada: los accesos directos del ícono abren una herramienta (app.html?h=vuelos)
+  try {
+    const h0 = new URLSearchParams(location.search).get('h');
+    const tb = h0 && /^[a-z]{3,12}$/.test(h0) && box.querySelector(`[data-tab="${h0}"]`);
+    if (tb && !box.dataset.hDone) { box.dataset.hDone = '1'; tb.click(); }
+  } catch (e) {}
   // 1.0.2: llega desde el bot con un vuelo (app.html?vuelo=BOG-MIA-2026-12-15): abre la pestaña de vuelos con la búsqueda lista
   try {
     const v0 = new URLSearchParams(location.search).get('vuelo');
