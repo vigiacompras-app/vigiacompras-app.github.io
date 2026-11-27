@@ -1,6 +1,6 @@
 /* Vigía app: guarda la pantalla principal para que abra rápido y funcione sin internet (las búsquedas sí necesitan internet). */
-const CACHE = 'vigia-app-v1';
-const FILES = ['app.html', 'estilo.css', 'ajustes.js', 'sitio.js', 'herramientas.js', 'vigia-tiendas.js', 'vigia-viajes.js', 'logo.svg', 'logo-512.png', 'favicon.png', 'icon-192.png', 'manifest.webmanifest'];
+const CACHE = 'vigia-app-v2';
+const FILES = ['app.html', 'estilo.css', 'ajustes.js', 'sitio.js', 'herramientas.js', 'vigia-tiendas.js', 'vigia-viajes.js', 'aeropuertos.js', 'logo.svg', 'logo-512.png', 'favicon.png', 'icon-192.png', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 // Primero internet (para ver siempre lo último que publicaste); si no hay conexión, la copia guardada
