@@ -271,13 +271,17 @@
   }
   // Llega desde el bot de Telegram (app.html?q=producto): la búsqueda queda lista
   try {
-    const q0 = new URLSearchParams(location.search).get('q');
+    const P0 = new URLSearchParams(location.search);
+    // Menú "Compartir" del celular (app.html?url=…&text=…&title=…): toma el enlace del producto o, si no hay, el texto
+    const shared = (() => { const all = [P0.get('url'), P0.get('text'), P0.get('title')].filter(Boolean).join(' '); if (!all) return ''; const m = all.match(/https?:\/\/[^\s"'<>]+/i); return m ? m[0] : (P0.get('title') || P0.get('text') || '').trim(); })();
+    const q0 = P0.get('q') || shared;
+    if (shared) { const tc = box.querySelector('[data-tab="comparar"]'); if (tc) tc.click(); }
     const f0 = box.querySelector('[data-f="comparar"]');
     if (q0 && f0 && !box.dataset.qDone) { box.dataset.qDone = '1'; f0.elements.q.value = q0.slice(0, 200); f0.requestSubmit ? f0.requestSubmit() : f0.dispatchEvent(new Event('submit', { cancelable: true })); }
   } catch (e) {}
   // App instalada: los accesos directos del ícono abren una herramienta (app.html?h=vuelos)
   try {
-    const h0 = new URLSearchParams(location.search).get('h');
+    const sp0 = new URLSearchParams(location.search), h0 = (sp0.get('url') || sp0.get('text')) ? null : sp0.get('h');
     const tb = h0 && /^[a-z]{3,12}$/.test(h0) && box.querySelector(`[data-tab="${h0}"]`);
     if (tb && !box.dataset.hDone) { box.dataset.hDone = '1'; tb.click(); }
   } catch (e) {}
