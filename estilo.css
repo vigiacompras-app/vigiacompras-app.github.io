@@ -290,3 +290,15 @@ a.cal-d:hover { border-color: var(--brand); }
 .pcard { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); margin-bottom: 10px; }
 .pcard span { font-size: 24px; } .pcard div { display: grid; gap: 3px; } .pcard small { color: var(--muted); }
 @media (max-width: 480px) { .cal-d { min-height: 42px; font-size: 11px; } .cal-d b { font-size: 11px; } }
+
+/* Vuelos: solo ida / ida y vuelta y buscador de aeropuertos */
+.ttype { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.ttype .tl.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.ttype .tl span { color: inherit; } .ttype .tl:not(.on):hover { color: var(--brand); } .ttype .tl.on:hover { color: #fff; }
+.tform label[hidden] { display: none; }
+.apl { position: relative; }
+.apl-list { position: absolute; z-index: 30; top: 100%; left: 0; right: 0; margin: 4px 0 0; padding: 4px; list-style: none; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.14); max-height: 320px; overflow-y: auto; }
+.apl-list li { display: grid; gap: 2px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.apl-list li b { color: var(--ink); font-size: 14.5px; } .apl-list li b span { color: var(--brand); font-size: 13px; margin-left: 4px; }
+.apl-list li small { color: var(--muted); font-weight: 500; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.apl-list li.on, .apl-list li:hover { background: var(--soft); }
