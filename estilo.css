@@ -274,7 +274,7 @@ html[data-lang="es"] [data-l="es"], html[data-lang="en"] [data-l="en"] { display
 .appmode .apphero { padding: 28px 0 40px; }
 .appmode .apphero h1 { font-size: clamp(26px, 6vw, 40px); margin: 0 0 6px; text-align: center; }
 .appmode .apphero > .wrap > .hint { text-align: center; margin-bottom: 18px; }
-@media (max-width: 560px) { .vtools { padding: 14px; border-radius: 14px; } .tform.grid { grid-template-columns: 1fr 1fr; } .tform.grid .btn, .tform.grid label:has(select) { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .vtools { padding: 14px; border-radius: 14px; } .tform.grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .tform.grid > * { min-width: 0; } .tform input[type="date"] { min-width: 0; } .tform.grid .btn, .tform.grid label:has(select), .tform.grid label.apl { grid-column: 1 / -1; } }
 
 /* 1.1: calendario de vuelos y tarjeta de producto en la web */
 .cal { margin-top: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--card); }
