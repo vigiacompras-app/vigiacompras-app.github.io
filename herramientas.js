@@ -101,27 +101,94 @@
       if (q) return q;
       const parts = u.pathname.split('/').filter(Boolean).filter(p => !/^(p|dp|product|producto|productos|item|gp|ip|mla|mco|mlm|mlb|mlc|mpe)$/i.test(p));
       const best = parts.sort((a, b) => b.replace(/[^a-z]/gi, '').length - a.replace(/[^a-z]/gi, '').length)[0] || '';
-      return decodeURIComponent(best).replace(/\.(html?|aspx?|php)$/i, '').replace(/\b[A-Z]{2,4}-?\d{6,}\b/g, '').replace(/[-_+]+/g, ' ').replace(/\b\d{7,}\b/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      return decodeURIComponent(best).replace(/\.(html?|aspx?|php)$/i, '').replace(/_JM$/i, '').replace(/\b[A-Z]{2,4}-?\d{6,}\b/g, '').replace(/[-_+]+/g, ' ').replace(/\b\d{7,}\b/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
     } catch (e) { return v; }
   }
   const out = k => box.querySelector(`[data-o="${k}"]`);
+  // ---------- 1.1: herramientas con resultados dentro de la web (servidor de Vigía) ----------
+  const SRV = Object.assign({ url: 'https://iawhorusinrnkxmnsnwi.supabase.co', key: 'sb_publishable_G3nkWdS47XaIoVmHOXAPnw_dzUQzyX_' }, S.servidor || {});
+  const webId = () => { try { let v = localStorage.getItem('vigia-web-id'); if (!v) { v = 'web-' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36); localStorage.setItem('vigia-web-id', v); } return v; } catch (e) { return 'web-anon-' + Date.now().toString(36); } };
+  async function srv(action, body) {
+    try {
+      const ctl = new AbortController(); setTimeout(() => ctl.abort(), 12000);
+      const r = await fetch(SRV.url.replace(/\/$/, '') + '/functions/v1/vigia-notify', { method: 'POST', signal: ctl.signal, headers: { apikey: SRV.key, 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ action, install: webId(), lang: lang() }, body)) });
+      return await r.json();
+    } catch (e) { return null; }
+  }
+  const usd = n => '$' + Math.round(n).toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO') + ' USD';
+  // Calendario de precios de un mes (Aviasales): cada día con su precio más bajo; el más barato resaltado
+  async function calendar(trip, month) {
+    const o = out('vuelos'), slot = o && o.querySelector('[data-cal]');
+    if (!slot) return;
+    slot.innerHTML = `<p class="hint">⏳ ${L('Buscando los días más baratos…', 'Finding the cheapest days…')}</p>`;
+    const r = await srv('tp_calendar', { from: trip.from, to: trip.to, month });
+    if (!slot.isConnected) return;
+    const [y, m] = month.split('-').map(Number);
+    const first = new Date(Date.UTC(y, m - 1, 1)), days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    const prev = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7), next = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 7);
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const title = (() => { try { return new Intl.DateTimeFormat(lang() === 'en' ? 'en-US' : 'es-CO', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(first); } catch (e) { return month; } })();
+    const D = (r && r.ok && r.days) || {};
+    const prices = Object.values(D).map(x => x.p), min = prices.length ? Math.min(...prices) : null;
+    const today = new Date().toISOString().slice(0, 10);
+    const wd = (lang() === 'en' ? ['M', 'T', 'W', 'T', 'F', 'S', 'S'] : ['L', 'M', 'M', 'J', 'V', 'S', 'D']).map(x => `<b class="cal-h">${x}</b>`).join('');
+    let cells = '';
+    for (let i = 0; i < (first.getUTCDay() + 6) % 7; i++) cells += '<span></span>';
+    for (let d = 1; d <= days; d++) {
+      const iso = `${month}-${String(d).padStart(2, '0')}`, x = D[iso];
+      if (!x || iso < today) { cells += `<span class="cal-d${iso < today ? ' past' : ''}"><i>${d}</i></span>`; continue; }
+      const url = TV.aviasalesUrl(Object.assign({}, trip, { out: iso, back: null }), avMarker());
+      cells += `<a class="cal-d${x.p === min ? ' best' : ''}" href="${esc(url)}" target="_blank" rel="noopener ${avMarker() ? 'sponsored' : 'nofollow'}" title="${esc(iso + (x.t === 0 ? ' · ' + T('directo', 'nonstop') : ' · ' + x.t + ' ' + T('escala(s)', 'stop(s)')))}"><i>${d}</i><b>${esc('$' + Math.round(x.p))}</b></a>`;
+    }
+    slot.innerHTML = `<div class="cal"><div class="cal-top"><button type="button" class="tl" data-cal-go="${prev}" ${prev < thisMonth ? 'disabled' : ''}>‹</button><b>${esc(title)} · ${esc(trip.from)} → ${esc(trip.to)}</b><button type="button" class="tl" data-cal-go="${next}">›</button></div>
+      ${prices.length ? `<div class="cal-g">${wd}${cells}</div><p class="hint">✈️ ${L(`Día más barato desde <b>${usd(min)}</b> por persona, solo ida. Toca un día para verlo en Aviasales 🤝. Precios que vieron otros viajeros en los últimos días; pueden cambiar.`, `Cheapest day from <b>${usd(min)}</b> per person, one way. Tap a day to see it on Aviasales 🤝. Prices other travelers saw recently; they may change.`)}</p>`
+        : `<p class="hint">${L('Aún no hay precios guardados para esta ruta en este mes. Prueba el mes siguiente o usa los enlaces de arriba.', 'No saved prices for this route this month yet. Try next month or use the links above.')}</p>`}</div>`;
+    slot.dataset.trip = JSON.stringify(trip);
+  }
+  box.addEventListener('click', e => {
+    const b = e.target.closest('[data-cal-go]');
+    if (!b) return;
+    const slot = b.closest('[data-cal]');
+    try { calendar(JSON.parse(slot.dataset.trip), b.dataset.calGo); } catch (er) {}
+  });
+  // "Pega un enlace": lee el producto en el servidor y compara con su nombre real
+  async function readLink(url, k) {
+    out(k).innerHTML = `<p class="hint">⏳ ${L('Leyendo el producto…', 'Reading the product…')}</p>`;
+    const r = await srv('read_link', { url });
+    if (!(r && r.ok && r.q)) return null;
+    // Quita el nombre de la tienda ("Amazon.com: …", "… | Falabella") y descarta páginas que no son un producto
+    const shop = /^(amazon(\.com)?(\.[a-z]{2})?|mercado ?libre|falabella|walmart|ebay|aliexpress|temu|shein|exito|éxito|alkosto|linio|liverpool|best ?buy|target|coppel)$/i;
+    const clean = s => String(s || '').replace(/^\s*(amazon(\.com)?(\.[a-z]{2})?|walmart\.com|ebay)\s*[:|\-–]\s*/i, '').replace(/\s*[|\-–]\s*(amazon|mercado ?libre|falabella|walmart|ebay|aliexpress|temu|shein|éxito|exito|alkosto|liverpool)[^|\-–]*$/i, '').trim();
+    r.name = clean(r.name); r.q = clean(r.q).split(/\s+/).slice(0, 8).join(' ');
+    if (r.q.length < 3 || shop.test(r.q)) return null;
+    return r;
+  }
   const fmt = n => (Math.round(n * 100) / 100).toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO');
 
   box.addEventListener('submit', e => {
     e.preventDefault();
     const f = e.target, k = f.dataset.f, v = n => (f.elements[n] ? String(f.elements[n].value || '').trim() : '');
     if (k === 'comparar') {
-      const q = queryFrom(v('q'));
-      if (!q || !ST) return;
-      const list = ST.storesFor(country).map(s => ({ name: s.name, url: ST.searchUrl(s, q) })).filter(x => x.url);
-      list.push({ name: 'Google Shopping', url: ST.googleShoppingUrl ? ST.googleShoppingUrl(q, country) : 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(q) });
-      out(k).innerHTML = `<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p>${go(list)}`;
+      const raw = v('q');
+      const show = (q, prod) => {
+        const list = ST.storesFor(country).map(s => ({ name: s.name, url: ST.searchUrl(s, q) })).filter(x => x.url);
+        list.push({ name: 'Google Shopping', url: ST.googleShoppingUrl ? ST.googleShoppingUrl(q, country) : 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(q) });
+        const card = prod ? `<div class="pcard"><span>📦</span><div><b>${esc(prod.name)}</b>${prod.price ? `<small>${L('Precio en esa página', 'Price on that page')}: <b>${esc(prod.price.toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO'))}${prod.currency ? ' ' + esc(prod.currency) : ''}</b></small>` : ''}<small>${L('Compáralo abajo en otras tiendas de', 'Compare it below in other stores in')} ${esc(cname(country))} ${L('(mira el precio TOTAL con envío)', '(check the TOTAL price with shipping)')}</small></div></div>` : '';
+        out(k).innerHTML = `${card}<p class="hint">${L('Buscando', 'Searching')} <b>${esc(q)}</b> · ${esc(cname(country))}</p>${go(list)}`;
+      };
+      if (!ST || !raw) return;
+      if (/^(https?:\/\/|www\.)/i.test(raw)) { readLink(raw, k).then(r => { const q = r ? r.q : queryFrom(raw); if (q) show(q, r); else out(k).innerHTML = `<p class="hint">${L('No pude leer ese enlace. Escribe el nombre del producto.', 'I could not read that link. Type the product name.')}</p>`; }); return; }
+      show(raw, null);
     }
     if (k === 'vuelos' && TV) {
       const iata = x => /^[a-z]{3}$/i.test(x) ? x.toUpperCase() : null;
       const a = v('from'), b = v('to');
       const trip = { kind: 'flight', site: 'vigia', from: iata(a), to: iata(b), fromName: iata(a) ? null : a, toName: iata(b) ? null : b, out: v('out') || null, back: v('back') || null, adults: +v('pax') || 1 };
-      out(k).innerHTML = `<p class="hint">${L('Abre 2 o 3 y compara. Ojo con la maleta: usa "Precio real del vuelo".', 'Open 2 or 3 and compare. Watch the bag fees: use "Real flight price".')}</p>${go((avMarker() && TV.aviasalesUrl ? [{ name: 'Aviasales', url: TV.aviasalesUrl(trip, avMarker()), aff: true }] : []).concat(TV.flightLinks(trip, country)))}${!trip.from || !trip.to ? `<p class="hint">${L('Tip: con el código del aeropuerto (BOG, MIA, MAD) las páginas abren con tu búsqueda lista.', 'Tip: with the airport code (BOG, MIA, MAD) the sites open with your search ready.')}</p>` : ''}`;
+      out(k).innerHTML = `<p class="hint">${L('Abre 2 o 3 y compara. Ojo con la maleta: usa "Precio real del vuelo".', 'Open 2 or 3 and compare. Watch the bag fees: use "Real flight price".')}</p>${go((avMarker() && TV.aviasalesUrl ? [{ name: 'Aviasales', url: TV.aviasalesUrl(trip, avMarker()), aff: true }] : []).concat(TV.flightLinks(trip, country)))}${!trip.from || !trip.to ? `<p class="hint">${L('Tip: con el código del aeropuerto (BOG, MIA, MAD) las páginas abren con tu búsqueda lista y ves el calendario de días baratos.', 'Tip: with the airport code (BOG, MIA, MAD) the sites open with your search ready and you see the cheap-days calendar.')}</p>` : '<div data-cal></div>'}`;
+      if (trip.from && trip.to && TV.aviasalesUrl) {
+        const m0 = (trip.out || '').slice(0, 7), now = new Date().toISOString().slice(0, 7);
+        calendar(trip, /^\d{4}-\d{2}$/.test(m0) && m0 >= now ? m0 : now);
+      }
     }
     if (k === 'hoteles' && TV) {
       const ci = v('in'), co = v('outd');
