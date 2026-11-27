@@ -1,4 +1,5 @@
 {
+  "id": "/app.html?fuente=app",
   "name": "Vigía — compara antes de pagar",
   "short_name": "Vigía",
   "description": "Compara productos en todas las tiendas de tu país, busca vuelos y hoteles y calcula el precio real con maletas.",
@@ -8,10 +9,84 @@
   "background_color": "#FFFFFF",
   "theme_color": "#2F80ED",
   "lang": "es",
-  "categories": ["shopping", "travel", "finance"],
+  "categories": [
+    "shopping",
+    "travel",
+    "finance"
+  ],
   "icons": [
-    { "src": "logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Comparar un producto",
+      "short_name": "Comparar",
+      "description": "Busca un producto en todas las tiendas de tu país",
+      "url": "app.html?h=comparar&fuente=atajo",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Buscar vuelos",
+      "short_name": "Vuelos",
+      "description": "Calendario de días baratos y todas las aerolíneas",
+      "url": "app.html?h=vuelos&fuente=atajo",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "¿El descuento es real?",
+      "short_name": "Descuento",
+      "description": "Revisa si una rebaja es de verdad",
+      "url": "app.html?h=descuento&fuente=atajo",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Precio real del vuelo",
+      "short_name": "Precio real",
+      "description": "Suma maletas y cargos antes de pagar",
+      "url": "app.html?h=real&fuente=atajo",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }
