@@ -65,8 +65,9 @@
   const PANES = {
     comparar: `<form class="tform" data-f="comparar"><label>${L('¿Qué quieres comprar? Escribe el producto o pega el enlace', 'What do you want to buy? Type the product or paste the link')}<input name="q" required placeholder="iPhone 15 128GB / https://…" autocomplete="off"></label>
       <label>${L('Tu país', 'Your country')}${sel()}</label><button class="btn">${L('Buscar en todas las tiendas', 'Search every store')}</button></form><div class="tout" data-o="comparar"></div>`,
-    vuelos: `<form class="tform grid" data-f="vuelos"><label>${L('Desde', 'From')}<input name="from" required placeholder="BOG / Bogotá"></label><label>${L('Hasta', 'To')}<input name="to" required placeholder="MIA / Miami"></label>
-      <label>${L('Ida', 'Depart')}<input name="out" type="date" value="${day(14)}"></label><label>${L('Vuelta (opcional)', 'Return (optional)')}<input name="back" type="date" value="${day(18)}"></label>
+    vuelos: `<form class="tform grid" data-f="vuelos"><div class="ttype" role="group" aria-label="${T('Tipo de viaje', 'Trip type')}"><button type="button" class="tl" data-ttype="one" aria-pressed="false">➡️ ${L('Solo ida', 'One way')}</button><button type="button" class="tl on" data-ttype="round" aria-pressed="true">🔁 ${L('Ida y vuelta', 'Round trip')}</button></div>
+      <label class="apl">${L('Desde', 'From')}<input name="from" required placeholder="${T('Ciudad o código', 'City or code')}" autocomplete="off" data-ap></label><label class="apl">${L('Hasta', 'To')}<input name="to" required placeholder="${T('Ej.: Miami o MIA', 'E.g. Miami or MIA')}" autocomplete="off" data-ap></label>
+      <label>${L('Ida', 'Depart')}<input name="out" type="date" value="${day(14)}"></label><label data-back>${L('Vuelta', 'Return')}<input name="back" type="date" value="${day(18)}"></label>
       <label>${L('Pasajeros', 'Passengers')}<input name="pax" type="number" min="1" max="9" value="1"></label><label>${L('Tu país', 'Your country')}${sel()}</label><button class="btn">${L('Buscar en todas las páginas', 'Search every site')}</button></form><div class="tout" data-o="vuelos"></div>`,
     hoteles: `<form class="tform grid" data-f="hoteles"><label>${L('Destino', 'Destination')}<input name="dest" required placeholder="Cartagena"></label><label>${L('Llegada', 'Check-in')}<input name="in" type="date" value="${day(14)}"></label>
       <label>${L('Salida', 'Check-out')}<input name="outd" type="date" value="${day(18)}"></label><label>${L('Personas', 'Guests')}<input name="pax" type="number" min="1" max="16" value="2"></label><label>${L('Tu país', 'Your country')}${sel()}</label><button class="btn">${L('Buscar en todas las páginas', 'Search every site')}</button></form><div class="tout" data-o="hoteles"></div>`,
@@ -164,6 +165,48 @@
     return r;
   }
   const fmt = n => (Math.round(n * 100) / 100).toLocaleString(lang() === 'en' ? 'en-US' : 'es-CO');
+  // ---------- Buscador de aeropuertos: escribes la ciudad y eliges de la lista (lista local, sin servicios externos) ----------
+  const AP = (() => {
+    let list = window.VigiaAeropuertos || null, loading = null;
+    const fold = x => String(x || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    const load = () => { if (list || loading) return loading || Promise.resolve(); loading = new Promise(res => { const sc = document.createElement('script'); sc.src = 'aeropuertos.js'; sc.onload = () => { list = (window.VigiaAeropuertos || []).map(a => ({ c: a[0], city: a[1], name: a[2], cc: a[3], big: a[4], k: fold(a[0] + ' ' + a[1] + ' ' + a[2] + ' ' + (a[5] || '')), kc: fold(a[1]) })); res(); }; sc.onerror = () => { loading = null; res(); }; document.head.appendChild(sc); }); return loading; };
+    let dn = null; const country = cc => { try { dn = dn || new Intl.DisplayNames([lang() === 'en' ? 'en' : 'es'], { type: 'region' }); return dn.of(cc); } catch (e) { return cc; } };
+    const find = (q, n) => {
+      if (!Array.isArray(list)) return [];
+      const f = fold(q); if (f.length < 2) return [];
+      const words = f.split(/\s+/);
+      const sc = a => { if (a.c.toLowerCase() === f) return 0; if (a.kc === f) return 1; if (a.kc.startsWith(f)) return 2; if (words.every(w => a.k.includes(w))) return 3; return 9; };
+      return list.map(a => [sc(a), a]).filter(x => x[0] < 9).sort((x, y) => x[0] - y[0] || y[1].big - x[1].big || x[1].city.localeCompare(y[1].city)).slice(0, n || 8).map(x => x[1]);
+    };
+    // Si escribió una ciudad sin elegir de la lista: usa el aeropuerto principal solo cuando la coincidencia es clara
+    const best = q => { const r = find(q, 2); if (!r.length) return null; const f = fold(q); return (r[0].kc === f || r[0].c.toLowerCase() === f) ? r[0].c : null; };
+    const label = a => `${a.city} (${a.c})`;
+    return { load, find, best, label, country };
+  })();
+  function apClose(inp) { const ul = inp && inp.parentNode.querySelector('.apl-list'); if (ul) ul.remove(); inp && inp.setAttribute('aria-expanded', 'false'); }
+  function apShow(inp) {
+    const r = AP.find(inp.value, 8); let ul = inp.parentNode.querySelector('.apl-list');
+    if (!r.length) { apClose(inp); return; }
+    if (!ul) { ul = document.createElement('ul'); ul.className = 'apl-list'; ul.setAttribute('role', 'listbox'); inp.parentNode.appendChild(ul); }
+    ul.innerHTML = r.map((a, i) => `<li role="option" data-apc="${esc(a.c)}" data-apl="${esc(AP.label(a))}"${i === 0 ? ' class="on"' : ''}><b>${esc(a.city)} <span>${esc(a.c)}</span></b><small>${esc(a.name)} · ${esc(AP.country(a.cc))}</small></li>`).join('');
+    inp.setAttribute('aria-expanded', 'true');
+  }
+  const apPick = (inp, li) => { inp.value = li.dataset.apl; apClose(inp); };
+  box.addEventListener('focusin', e => { if (e.target.matches('[data-ap]')) AP.load(); });
+  box.addEventListener('input', e => { const inp = e.target; if (!inp.matches('[data-ap]')) return; AP.load().then(() => { if (document.activeElement === inp) apShow(inp); }); });
+  box.addEventListener('keydown', e => {
+    const inp = e.target; if (!inp.matches('[data-ap]')) return;
+    const ul = inp.parentNode.querySelector('.apl-list'); if (!ul) return;
+    const items = [...ul.children], i = items.findIndex(x => x.classList.contains('on'));
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const j = (i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; items.forEach((x, k) => x.classList.toggle('on', k === j)); }
+    else if (e.key === 'Enter' && i >= 0) { e.preventDefault(); apPick(inp, items[i]); }
+    else if (e.key === 'Escape') apClose(inp);
+  });
+  box.addEventListener('pointerdown', e => { const li = e.target.closest('.apl-list li'); if (!li) return; e.preventDefault(); apPick(li.closest('label').querySelector('[data-ap]'), li); });
+  box.addEventListener('focusout', e => { if (e.target.matches('[data-ap]')) setTimeout(() => apClose(e.target), 150); });
+  // Solo ida / Ida y vuelta
+  const setTrip = (f, t) => { f.dataset.trip = t; f.querySelectorAll('[data-ttype]').forEach(b => { const on = b.dataset.ttype === t; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); const bk = f.querySelector('[data-back]'); if (bk) bk.hidden = t === 'one'; };
+  box.addEventListener('click', e => { const b = e.target.closest('[data-ttype]'); if (b) setTrip(b.closest('form'), b.dataset.ttype); });
 
   box.addEventListener('submit', e => {
     e.preventDefault();
@@ -181,9 +224,9 @@
       show(raw, null);
     }
     if (k === 'vuelos' && TV) {
-      const iata = x => /^[a-z]{3}$/i.test(x) ? x.toUpperCase() : null;
+      const iata = x => { const m = String(x || '').match(/\(([A-Z]{3})\)\s*$/) || String(x || '').trim().match(/^([a-z]{3})$/i); return m ? m[1].toUpperCase() : (AP.best(x) || null); };
       const a = v('from'), b = v('to');
-      const trip = { kind: 'flight', site: 'vigia', from: iata(a), to: iata(b), fromName: iata(a) ? null : a, toName: iata(b) ? null : b, out: v('out') || null, back: v('back') || null, adults: +v('pax') || 1 };
+      const trip = { kind: 'flight', site: 'vigia', from: iata(a), to: iata(b), fromName: iata(a) ? null : a, toName: iata(b) ? null : b, out: v('out') || null, back: (f.dataset.trip === 'one' ? null : v('back') || null), adults: +v('pax') || 1 };
       out(k).innerHTML = `<p class="hint">${L('Abre 2 o 3 y compara. Ojo con la maleta: usa "Precio real del vuelo".', 'Open 2 or 3 and compare. Watch the bag fees: use "Real flight price".')}</p>${go((avMarker() && TV.aviasalesUrl ? [{ name: 'Aviasales', url: TV.aviasalesUrl(trip, avMarker()), aff: true }] : []).concat(TV.flightLinks(trip, country)))}${!trip.from || !trip.to ? `<p class="hint">${L('Tip: con el código del aeropuerto (BOG, MIA, MAD) las páginas abren con tu búsqueda lista y ves el calendario de días baratos.', 'Tip: with the airport code (BOG, MIA, MAD) the sites open with your search ready and you see the cheap-days calendar.')}</p>` : '<div data-cal></div>'}`;
       if (trip.from && trip.to && TV.aviasalesUrl) {
         const m0 = (trip.out || '').slice(0, 7), now = new Date().toISOString().slice(0, 7);
@@ -241,7 +284,7 @@
       const m = /^([A-Za-z]{3})-([A-Za-z]{3})(?:-(\d{4}-\d{2}-\d{2}))?$/.exec(v0.trim());
       if (m) {
         fv.elements.from.value = m[1].toUpperCase(); fv.elements.to.value = m[2].toUpperCase();
-        if (m[3]) { fv.elements.out.value = m[3]; fv.elements.back.value = ''; }
+        if (m[3]) { fv.elements.out.value = m[3]; fv.elements.back.value = ''; setTrip(fv, 'one'); }
         fv.requestSubmit ? fv.requestSubmit() : fv.dispatchEvent(new Event('submit', { cancelable: true }));
       }
     }
