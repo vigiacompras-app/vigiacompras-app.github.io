@@ -88,5 +88,14 @@
         }
       ]
     }
-  ]
+  ],
+  "share_target": {
+    "action": "app.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
